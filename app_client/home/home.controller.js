@@ -1,6 +1,6 @@
 angular
   .module('jorgePortfolioApp')
-    .controller('homeController', homeController);
+  .controller('homeController', homeController);
 
 homeController.$inject = ['$scope'];
 function homeController($scope){

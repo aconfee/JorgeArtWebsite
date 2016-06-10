@@ -15,6 +15,11 @@
         controller: 'homeController',
         controllerAs: 'viewModel'
       })
+      .when('/about', {
+        templateUrl: 'about/about.view.html',
+        controller: 'aboutController',
+        controllerAs: 'viewModel'
+      })
       .otherwise({redirectTo: '/'});
 
     $locationProvider.html5Mode({
