@@ -9,4 +9,4 @@ function homeController($scope){
   viewModel.exampleData = {
     exampleItem: 'Example text from home controller being passed to example-directive.'
   };
-};
+}

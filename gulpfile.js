@@ -12,12 +12,19 @@
 
 // Require all needed task objects.
 var gulp = require('gulp');
+
+// Distribute
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var minify = require('gulp-clean-css');
 var sourcemaps = require('gulp-sourcemaps');
+
+// Clean
+var jslint = require('gulp-jslint');
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
 
 // Path variables.
 var jsFiles = [
@@ -34,6 +41,19 @@ var sassFiles = './public/stylesheets/sass/*.scss';
 var cssCompileLocation = './public/stylesheets/css';
 var cssDistLocation = './public/stylesheets';
 
+gulp.task('lint', function () {
+  return gulp.src(jsFiles)
+    .pipe(jslint({ /* this object represents the JSLint directives being passed down */ }))
+    .pipe(jslint.reporter( 'default' )
+    .pipe(jslint.reporter( 'stylish' )));
+});
+
+gulp.task('hint', function() {
+  return gulp.src(jsFiles)
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish));
+});
+
 // Concat, rename, and uglify all js files for our spa.
 gulp.task('uglify-js', function(){
   return gulp.src(jsFiles)
@@ -46,25 +66,7 @@ gulp.task('uglify-js', function(){
     .pipe(gulp.dest(jsDistLocation));
 });
 
-// Compile sass
-//gulp.task('sass-compile', function(){
-//  return gulp.src('./public/stylesheets/sass/*.scss')
-//    .pipe(sass().on('error', sass.logError))
-//    .pipe(gulp.dest('./public/stylesheets/css'));
-//});
-
-// Concat, rename, and minify all css.
-//gulp.task('minify-css', function(){
-//  return gulp.src('./public/stylesheets/css/**/*.css')
-//    .pipe(concat('dist.css'))
-//    .pipe(gulp.dest('./public/stylesheets'))
-//    .pipe(rename('dist.min.css'))
-//    .pipe(minify({compatibility: 'ie8'}))
-//    .pipe(gulp.dest('./public/stylesheets/'));
-//});
-
-
-// Combo of compile and minify -- using pipe to guarantee compile finishes before minify starts.
+// Combo of compile sass and minify css -- using pipe to guarantee compile finishes before minify starts.
 gulp.task('distribute-sass', function(){
   return gulp.src(sassFiles)
     .pipe(sourcemaps.init())
@@ -78,11 +80,6 @@ gulp.task('distribute-sass', function(){
     .pipe(gulp.dest(cssDistLocation));
 });
 
-// Watch sass files to compile when changed.
-//gulp.task('sass-watch', function(){
-//  gulp.watch('./public/stylesheets/sass/**/*.scss', ['sass']);
-//});
-
 // Watch project and redistribute when changes are made to scss or js files.
 gulp.task('distribute-watch', function(){
   gulp.watch(sassFiles, ['distribute-sass']);
@@ -91,6 +88,7 @@ gulp.task('distribute-watch', function(){
 
 // Run all default tasks to build out dist.
 gulp.task('default', [
+  'hint',
   'uglify-js',
   'distribute-sass'
 ]);

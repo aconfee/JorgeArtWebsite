@@ -15,18 +15,20 @@
         controller: 'homeController',
         controllerAs: 'viewModel'
       })
-      .when('/about', {
+      .when('/about/', {
         templateUrl: 'about/about.view.html',
         controller: 'aboutController',
         controllerAs: 'viewModel'
       })
       .otherwise({redirectTo: '/'});
 
+/*
     $locationProvider.html5Mode({
       enabled: true,
       requireBase: false
     });
-  };
+    */
+  }
 
   // Add the config to our app.
   angular
@@ -46,7 +48,7 @@ function homeController($scope){
   viewModel.exampleData = {
     exampleItem: 'Example text from home controller being passed to example-directive.'
   };
-};
+}
 
 angular
   .module('jorgePortfolioApp')
