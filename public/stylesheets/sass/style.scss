@@ -1,3 +1,7 @@
+@mixin container-flex($flexgrow){
+  flex:$flexgrow;
+}
+
 body{
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -5,4 +9,48 @@ body{
 
 a{
   color: #00B7FF;
+}
+
+.img-group {
+  width:100%;
+  display:flex;
+
+  img{
+    width:100%;
+    height:auto;
+  }
+}
+
+.img-container{
+  padding:5px;
+}
+
+.img-1-container{
+  @include container-flex(0.638);
+  @extend .img-container;
+}
+
+.img-2-container{
+  @include container-flex(1.7);
+  @extend .img-container;
+}
+
+.img-3-container{
+  @include container-flex(1.7);
+  @extend .img-container;
+}
+
+.img-4-container{
+  @include container-flex(1.77);
+  @extend .img-container;
+}
+
+.img-5-container{
+  @include container-flex(1.76);
+  @extend .img-container;
+}
+
+.img-6-container{
+  @include container-flex(1.77);
+  @extend .img-container;
 }

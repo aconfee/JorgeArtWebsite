@@ -4,3 +4,31 @@ body {
 
 a {
   color: #00B7FF; }
+
+.img-group {
+  width: 100%;
+  display: flex; }
+  .img-group img {
+    width: 100%;
+    height: auto; }
+
+.img-container, .img-1-container, .img-2-container, .img-3-container, .img-4-container, .img-5-container, .img-6-container {
+  padding: 5px; }
+
+.img-1-container {
+  flex: 0.638; }
+
+.img-2-container {
+  flex: 1.7; }
+
+.img-3-container {
+  flex: 1.7; }
+
+.img-4-container {
+  flex: 1.77; }
+
+.img-5-container {
+  flex: 1.76; }
+
+.img-6-container {
+  flex: 1.77; }
