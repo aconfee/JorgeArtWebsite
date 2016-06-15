@@ -1,7 +1,7 @@
 (function(){
   angular
     .module('jorgePortfolioApp')
-    .directive('navigationBar', navigationBar)
+    .directive('navigationBar', navigationBar);
 
   function navigationBar(){
     return{

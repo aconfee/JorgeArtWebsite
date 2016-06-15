@@ -15,19 +15,15 @@
         controller: 'homeController',
         controllerAs: 'viewModel'
       })
-      .when('/about/', {
+      .when('/about', {
         templateUrl: 'about/about.view.html',
         controller: 'aboutController',
         controllerAs: 'viewModel'
       })
       .otherwise({redirectTo: '/'});
 
-/*
-    $locationProvider.html5Mode({
-      enabled: true,
-      requireBase: false
-    });
-    */
+    // Pretty up URLs. Base defined in index.html.
+    $locationProvider.html5Mode(true);
   }
 
   // Add the config to our app.
@@ -64,7 +60,7 @@ function aboutController($scope){
 (function(){
   angular
     .module('jorgePortfolioApp')
-    .directive('navigationBar', navigationBar)
+    .directive('navigationBar', navigationBar);
 
   function navigationBar(){
     return{

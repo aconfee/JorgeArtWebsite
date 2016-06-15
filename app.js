@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-// No need to route outside API since using SPA. 
+// No need to route outside API since using SPA.
 //var routes = require('./app_server/routes/index');
 
 var app = express();
@@ -40,16 +40,15 @@ app.use(express.static(path.join(__dirname, 'app_client')));
 // Don't do routing through Express since using SPA.
 //app.use('/', routes);
 
-/*
-// No need to serve this file since static is defaulting to index.html in the app_client folder.
+// If we send a route in the URL bar, or refresh, the route is sent to express, not handled
+// by Angular. So be sure to redirect everything back to Angular to handle.
 app.use(function(req, res){
   res.sendfile(path.join(__dirname, 'app_client', 'index.html'));
 });
-*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  var err = new Error('Not Found on Server');
   err.status = 404;
   next(err);
 });
