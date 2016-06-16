@@ -8,9 +8,10 @@ a {
 .img-group {
   width: 100%;
   display: flex; }
-  .img-group img {
-    width: 100%;
-    height: auto; }
+
+img {
+  width: 100%;
+  height: auto; }
 
 .img-container, .img-1-container, .img-2-container, .img-3-container, .img-4-container, .img-5-container, .img-6-container {
   padding: 5px; }

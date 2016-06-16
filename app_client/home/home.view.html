@@ -1,44 +1,8 @@
 <navigation-bar></navigation-bar>
 <example-directive content="viewModel.exampleData"></example-directive>
 
-<div class="img-group">
-  <div class="img-1-container">
-    <img src="/images/NoMan1.jpg"></img>
-  </div>
-  <div class="img-2-container">
-    <img src="/images/NoMan2.jpg"></img>
-  </div>
-  <div class="img-3-container">
-    <img src="/images/NoMan3.jpg"></img>
-  </div>
-</div>
-
-<div class="img-group">
-  <div class="img-5-container">
-    <img src="/images/NoMan5.jpeg"></img>
-  </div>
-  <div class="img-4-container">
-    <img src="/images/NoMan4.jpg"></img>
-  </div>
-  <div class="img-6-container">
-    <img src="/images/NoMan6.jpg"></img>
-  </div>
-</div>
-
-<div class="img-group">
-  <div class="img-2-container">
-    <img src="/images/NoMan2.jpg"></img>
-  </div>
-</div>
-
-<div class="img-group">
-  <div class="img-1-container">
-    <img src="/images/NoMan1.jpg"></img>
-  </div>
-  <div class="img-2-container">
-    <img src="/images/NoMan2.jpg"></img>
-  </div>
-  <div class="img-3-container">
-    <img src="/images/NoMan3.jpg"></img>
+<div class="img-group" ng-repeat="row in viewModel.projectRows">
+  <div class="img-container" style="flex:{{ project['aspect'] }}" ng-repeat="project in viewModel.projectRows[$index]">
+    <img src="{{ project['image'] }}"></img>
   </div>
 </div>
