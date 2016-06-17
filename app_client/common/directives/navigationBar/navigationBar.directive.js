@@ -1,6 +1,6 @@
 (function(){
   angular
-    .module('jorgePortfolioApp')
+    .module('PortfolioSPAModule')
     .directive('navigationBar', navigationBar);
 
   function navigationBar(){

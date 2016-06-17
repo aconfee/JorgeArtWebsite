@@ -5,7 +5,7 @@
 (function(){
 
   // Define the app module and it's dependencies.
-  angular.module('jorgePortfolioApp', ['ngRoute']);
+  angular.module('PortfolioSPAModule', ['ngRoute']);
 
   // Create a config for our app -- configure our routes.
   function config ($routeProvider, $locationProvider){
@@ -28,7 +28,7 @@
 
   // Add the config to our app.
   angular
-    .module('jorgePortfolioApp')
+    .module('PortfolioSPAModule')
     .config(['$routeProvider', '$locationProvider', config]);
 
 })();

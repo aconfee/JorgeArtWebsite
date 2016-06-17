@@ -1,7 +1,7 @@
 (function(){
   angular
-    .module('jorgePortfolioApp')
-    .directive('exampleDirective', exampleDirective)
+    .module('PortfolioSPAModule')
+    .directive('exampleDirective', exampleDirective);
 
   function exampleDirective(){
     return{

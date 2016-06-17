@@ -28,11 +28,8 @@ var stylish = require('jshint-stylish');
 
 // Path variables.
 var jsFiles = [
-  './app_client/app.js',
-  './app_client/home/home.controller.js',
-  './app_client/about/about.controller.js',
-  './app_client/common/directives/navigationBar/navigationBar.directive.js',
-  './app_client/common/directives/exampleDirective/example.directive.js'
+  './app_client/**/*.js',
+  '!./app_client/lib/**/*.js' // Exclude anything from lib.
 ];
 
 var jsDistLocation = './app_client/lib';
