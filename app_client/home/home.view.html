@@ -1,4 +1,19 @@
-<navigation-bar></navigation-bar>
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header"><a href="/" class="navbar-brand">Loc8r</a>
+      <button type="button" data-toggle="collapse" data-target="#navbar-main" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+    </div>
+    <div id="navbar-main" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li ng-click="viewModel.GetProjects('ALL');"><a>All</a></li>
+        <li ng-click="viewModel.GetProjects('FILM');"><a>Film</a></li>
+        <li ng-click="viewModel.GetProjects('ART');"><a>Art</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <example-directive content="viewModel.exampleData"></example-directive>
 
 <div class="img-group" ng-repeat="row in viewModel.projects">
@@ -6,3 +21,5 @@
     <img src="{{ project['image'] }}"></img>
   </div>
 </div>
+
+<underline-page-break></underline-page-break>
