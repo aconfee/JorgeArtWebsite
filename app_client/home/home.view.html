@@ -16,8 +16,8 @@
 
 <example-directive content="viewModel.exampleData"></example-directive>
 
-<div class="img-group" ng-repeat="row in viewModel.projects">
-  <div class="img-container" style="flex:{{ project['aspect'] }}" ng-repeat="project in viewModel.projects[$index]">
+<div class="flex-group-container" ng-repeat="row in viewModel.projects">
+  <div class="flex-item-container" style="flex:{{ project['aspect'] }}" ng-repeat="project in viewModel.projects[$index]">
     <img src="{{ project['image'] }}"></img>
   </div>
 </div>

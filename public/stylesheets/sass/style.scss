@@ -7,24 +7,16 @@ a{
   color: #00B7FF;
 }
 
-.img-group {
+.flex-group-container {
   width:100%;
   display:flex;
-}
 
-img{
-  width:100%;
-  height:auto;
-}
+  .flex-item-container{
+    padding:5px;
 
-.img-container{
-  padding:5px;
-}
-
-.underline-page-break{
-  border-bottom: 2px solid silver;
-  margin-top: 20px;
-  margin-bottom: 30px;
-  margin-left: 10%;
-  margin-right: 10%;
+    img{
+      width:100%;
+      height:auto;
+    }
+  }
 }

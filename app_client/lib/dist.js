@@ -65,6 +65,7 @@ function aboutController($scope){
     angular.element($window).bind('resize', function () {
       // Possiblity to cache here... if necessary.
       viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
+      $scope.$apply(); // This is needed here... will occasionally update on its own.
     });
 
     viewModel.exampleData = {
@@ -113,13 +114,51 @@ function aboutController($scope){
     service.GetProjects = function(category){
       // Get aspect ratio and store in db when uploaded.
       // Replace with $http call.
+      // build another document of data consisting of specific project page.. all
+      // the blog components.
       var projectsDto = [
-        {"image": "/images/NoMan1.jpg", "aspect": 0.665, "category": "FILM"},
-        {"image": "/images/NoMan2.jpg", "aspect": 1.78, "category": "ART"},
-        {"image": "/images/NoMan3.jpg", "aspect": 1.77, "category": "ART"},
-        {"image": "/images/NoMan4.jpg", "aspect": 1.77, "category": "ART"},
-        {"image": "/images/NoMan5.jpeg", "aspect": 1.777, "category": "ART"},
-        {"image": "/images/NoMan6.jpg", "aspect": 1.77, "category": "FILM"}
+        {
+          "id": "100", // use this to navigate to specific project url
+          "name": "NoMansSky", // could be useful
+          "image": "/images/NoMan1.jpg",
+          "aspect": 0.665,
+          "category": "FILM"
+        },
+        {
+          "id": "101",
+          "name": "NoMansSky2",
+          "image": "/images/NoMan2.jpg",
+          "aspect": 1.78,
+          "category": "ART"
+        },
+        {
+          "id": "102",
+          "name": "NoMansSky3",
+          "image": "/images/NoMan3.jpg",
+          "aspect": 1.77,
+          "category": "ART"
+        },
+        {
+          "id": "103",
+          "name": "NoMansSky4",
+          "image": "/images/NoMan4.jpg",
+          "aspect": 1.77,
+          "category": "ART"
+        },
+        {
+          "id": "104",
+          "name": "NoMansSky5",
+          "image": "/images/NoMan5.jpeg",
+          "aspect": 1.777,
+          "category": "ART"
+        },
+        {
+          "id": "105",
+          "name": "NoMansSky6",
+          "image": "/images/NoMan6.jpg",
+          "aspect": 1.77,
+          "category": "FILM"
+        }
       ];
 
       var filteredProjectsList = FilterProjectsByCategory(projectsDto, category);
@@ -227,12 +266,12 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('navigationBar', navigationBar);
+    .directive('underlinePageBreak', underlinePageBreak);
 
-  function navigationBar(){
+  function underlinePageBreak(){
     return{
       restrict:'EA',
-      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html'
+      templateUrl: '/common/directives/pageBreak/underline.directive.html'
     };
   }
 })();
@@ -240,12 +279,12 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('underlinePageBreak', underlinePageBreak);
+    .directive('navigationBar', navigationBar);
 
-  function underlinePageBreak(){
+  function navigationBar(){
     return{
       restrict:'EA',
-      templateUrl: '/common/directives/pageBreak/underline.directive.html'
+      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html'
     };
   }
 })();

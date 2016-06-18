@@ -19,6 +19,7 @@
     angular.element($window).bind('resize', function () {
       // Possiblity to cache here... if necessary.
       viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
+      $scope.$apply(); // This is needed here... will occasionally update on its own.
     });
 
     viewModel.exampleData = {

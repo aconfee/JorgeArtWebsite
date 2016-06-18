@@ -1,2 +1,2 @@
-body{padding:50px;font:14px "Lucida Grande",Helvetica,Arial,sans-serif}a{color:#00B7FF}.img-group{width:100%;display:flex}img{width:100%;height:auto}.img-container{padding:5px}.underline-page-break{border-bottom:2px solid silver;margin:20px 10% 30px}
+body{padding:50px;font:14px "Lucida Grande",Helvetica,Arial,sans-serif}a{color:#00B7FF}.flex-group-container{width:100%;display:flex}.flex-group-container .flex-item-container{padding:5px}.flex-group-container .flex-item-container img{width:100%;height:auto}.underline-page-break{border-bottom:2px solid silver;margin:20px 10% 30px}
 /*# sourceMappingURL=sourcemaps/dist.min.css.map */

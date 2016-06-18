@@ -34,7 +34,12 @@ var jsFiles = [
 
 var jsDistLocation = './app_client/lib';
 
-var sassFiles = './public/stylesheets/sass/*.scss';
+var sassFiles = [
+  './public/stylesheets/sass/*.scss',
+  './app_client/**/*.scss', // Self contained directive styles.
+  '!./app_client/lib/**/*.scss'
+];
+
 var cssCompileLocation = './public/stylesheets/css';
 var cssDistLocation = './public/stylesheets';
 
