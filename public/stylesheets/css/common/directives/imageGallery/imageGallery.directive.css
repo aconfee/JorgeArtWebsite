@@ -1,0 +1,12 @@
+.gallery-thumb-container {
+  display: flex;
+  width: 100%; }
+
+.gallery-thumb-column {
+  flex: 1; }
+
+.gallery-thumb-item {
+  padding: 5px; }
+  .gallery-thumb-item img {
+    width: 100%;
+    height: auto; }

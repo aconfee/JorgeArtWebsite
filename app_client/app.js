@@ -20,6 +20,11 @@
         controller: 'aboutController',
         controllerAs: 'viewModel'
       })
+      .when('/projects/100', {
+        templateUrl: 'projectPage/projectPage.view.html',
+        controller: 'projectPageController',
+        controllerAs: 'viewModel'
+      })
       .otherwise({redirectTo: '/'});
 
     // Pretty up URLs. Base defined in index.html.

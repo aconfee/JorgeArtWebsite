@@ -5,6 +5,7 @@ body{
 
 a{
   color: #00B7FF;
+  text-decoration:none;
 }
 
 .flex-group-container {
@@ -12,11 +13,47 @@ a{
   display:flex;
 
   .flex-item-container{
-    padding:5px;
+    position:relative;
+    margin:5px;
 
     img{
       width:100%;
       height:auto;
     }
   }
+}
+
+.project-cover-image{
+  min-width:100%;
+  min-height:100%;
+  position:absolute;
+  top:0;
+  left:0;
+
+  opacity: 0;
+  transition: opacity .15s ease-in-out;
+  -moz-transition: opacity .15s ease-in-out;
+  -webkit-transition: opacity .15s ease-in-out;
+}
+
+.project-cover-image:hover{
+  background-color: white;
+  opacity:0.8;
+}
+
+// How to make this opacity 1 when parent box is 0.5.
+.project-cover-text{
+  position:absolute;
+  top:50%;
+  left:0;
+  min-width:100%;
+  min-height:50%;
+  text-align: center;
+  font-size: 1.25em;
+  color:black;
+}
+
+.project-page-container{
+  max-width: 1200px;
+  margin:0 auto;
 }

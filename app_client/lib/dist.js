@@ -20,6 +20,11 @@
         controller: 'aboutController',
         controllerAs: 'viewModel'
       })
+      .when('/projects/100', {
+        templateUrl: 'projectPage/projectPage.view.html',
+        controller: 'projectPageController',
+        controllerAs: 'viewModel'
+      })
       .otherwise({redirectTo: '/'});
 
     // Pretty up URLs. Base defined in index.html.
@@ -52,10 +57,12 @@ function aboutController($scope){
     .module('PortfolioSPAModule')
     .controller('homeController', homeController);
 
-  homeController.$inject = ['$scope', '$window', 'ProjectsGalleryService'];
-  function homeController($scope, $window, ProjectsGalleryService){
+  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsGalleryService'];
+  function homeController($scope, $window, $location, $sce, ProjectsGalleryService){
     var viewModel = this;
-    var currentProjectsCategoryFilter = ProjectsGalleryService.allProjectsFilter;
+    var currentProjectsCategoryFilter = $location.search().category; // Once per 'page load'
+
+    viewModel.showVideo = currentProjectsCategoryFilter === undefined; // Promo on 'all' page.
 
     // TODO: Make the main gallery a directive and pass projectRows into it.
     viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
@@ -68,21 +75,43 @@ function aboutController($scope){
       $scope.$apply(); // This is needed here... will occasionally update on its own.
     });
 
-    viewModel.exampleData = {
-      exampleItem: 'Example text from home controller being passed to example-directive.'
-    };
+    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+  }
 
-    viewModel.GetProjects = function(categoryFilter){
-      if(categoryFilter != ProjectsGalleryService.allProjectsFilter &&
-        categoryFilter != ProjectsGalleryService.filmProjectsFilter &&
-        categoryFilter != ProjectsGalleryService.artProjectsFilter){
-          console.error("Invalid categoryFilter provided: " + categoryFilter);
-          return;
-      }
+})();
 
-      currentProjectsCategoryFilter = categoryFilter;
-      viewModel.projects = ProjectsGalleryService.GetProjects(categoryFilter);
-    };
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .controller('projectPageController', projectPageController);
+
+  projectPageController.$inject = ['$scope', '$sce', '$window', 'ProjectsGalleryService'];
+  function projectPageController($scope, $sce, $window, ProjectsGalleryService){
+    var viewModel = this;
+
+    // Make sure we always start at the top of the page.
+    $window.scrollTo(0, 0);
+
+    viewModel.text = "No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block.";
+    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/kF0FvsDNjrc");
+    viewModel.otherVideoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.galleryThumbs = [
+        "/images/NoMan1.jpg",
+        "/images/NoMan2.jpg",
+        "/images/NoMan3.jpg",
+        "/images/NoMan4.jpg",
+        "/images/NoMan5.jpeg",
+        "/images/NoMan6.jpg",
+        "/images/LastOf1.jpg",
+        "/images/LastOf2.jpg",
+        "/images/LastOf3.jpg",
+        "/images/LastOf4.jpg",
+        "/images/LastOf5.jpg",
+        "/images/LastOf6.jpg",
+        "/images/LastOf7.jpg",
+        "/images/LastOf8.jpg"
+    ];
   }
 
 })();
@@ -100,11 +129,11 @@ function aboutController($scope){
     var service = this;
 
     var smallScreenMax = 600;
-    var mediumScreenMax = 1000;
+    var mediumScreenMax = 1366;
 
-    service.allProjectsFilter = "ALL";
-    service.filmProjectsFilter = "FILM";
-    service.artProjectsFilter = "ART";
+    service.allProjectsFilter = undefined;
+    service.filmProjectsFilter = "film";
+    service.artProjectsFilter = "art";
 
     ///
     /// Call out to our API to get projects.
@@ -112,6 +141,14 @@ function aboutController($scope){
     /// Organize them into rows according to screen size.
     ///
     service.GetProjects = function(category){
+
+      if(category !== service.allProjectsFilter &&
+        category !== service.filmProjectsFilter &&
+        category !== service.artProjectsFilter){
+          console.error("Invalid category provided: " + category);
+          return;
+      }
+
       // Get aspect ratio and store in db when uploaded.
       // Replace with $http call.
       // build another document of data consisting of specific project page.. all
@@ -122,47 +159,47 @@ function aboutController($scope){
           "name": "NoMansSky", // could be useful
           "image": "/images/NoMan1.jpg",
           "aspect": 0.665,
-          "category": "FILM"
+          "category": "film"
         },
         {
           "id": "101",
           "name": "NoMansSky2",
           "image": "/images/NoMan2.jpg",
           "aspect": 1.78,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "102",
           "name": "NoMansSky3",
           "image": "/images/NoMan3.jpg",
           "aspect": 1.77,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "103",
           "name": "NoMansSky4",
           "image": "/images/NoMan4.jpg",
           "aspect": 1.77,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "104",
           "name": "NoMansSky5",
           "image": "/images/NoMan5.jpeg",
           "aspect": 1.777,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "105",
           "name": "NoMansSky6",
           "image": "/images/NoMan6.jpg",
           "aspect": 1.77,
-          "category": "FILM"
+          "category": "film"
         }
       ];
 
       var filteredProjectsList = FilterProjectsByCategory(projectsDto, category);
-      return MapProjectsDtoToVm(filteredProjectsList);
+      return service.MapProjectsDtoToVm(filteredProjectsList);
     };
 
     ///
@@ -207,7 +244,7 @@ function aboutController($scope){
     /// Take an array of projects and map them to a 2D array of relevent
     /// project info to be used by the view.
     ///
-    var MapProjectsDtoToVm = function(projects){
+    service.MapProjectsDtoToVm = function(projects){
       if(projects === undefined){
         console.error("projects is undefined.");
         return;
@@ -224,24 +261,24 @@ function aboutController($scope){
       }
 
       var rowSize = GetRowSize();
-      var projectGroups = [];
+      var projectRows = [];
       var rows = projects.length / rowSize;
 
       if(rows === 0) rows = 1;
 
+      var projectsIndex = 0;
       for (var y = 0; y < rows; y++) {
-        projectGroups.push([]);
+        projectRows.push([]);
 
-        for(var x = 0; x < rowSize; x++){
+        for(var x = 0; x < rowSize; x++, projectsIndex++){
           // Break if no projects remaining.
-          var projectsIndex = (rowSize * y) + x;
           if(projectsIndex === projects.length) break;
 
-          projectGroups[y].push(projects[ projectsIndex ]);
+          projectRows[y].push(projects[ projectsIndex ]);
         }
       }
 
-      return projectGroups;
+      return projectRows;
     };
 
   }
@@ -250,15 +287,111 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('exampleDirective', exampleDirective);
+    .directive('embededVideo', embededVideo);
 
-  function exampleDirective(){
+  function embededVideo(){
+    return{
+      restrict:'EA',
+      scope:{
+        link: '=link'
+      },
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .controller('imageGalleryController', imageGalleryController)
+    .directive('imageGallery', imageGallery);
+
+  function imageGallery(){
     return{
       restrict:'EA',
       scope:{
         content: '=content'
       },
-      templateUrl: '/common/directives/exampleDirective/example.directive.html'
+      templateUrl: '/common/directives/imageGallery/imageGallery.directive.html',
+      controller: imageGalleryController,
+      controllerAs: 'ctrl'
+    };
+  }
+
+  ///
+  /// Define a controller for this image gallery to use.
+  ///
+  imageGalleryController.$inject = ['$scope', '$window'];
+  function imageGalleryController($scope, $window){
+    var ctrl = this;
+    var tinyScreenMax = 600;
+    var smallScreenMax = 650;
+    var mediumScreenMax = 1000;
+    // Page container stops at 1200.
+
+    ctrl.GalleryThumbClick = function(){
+      console.log("thumb clicked!");
+    };
+
+    angular.element($window).bind('resize', function () {
+      console.log("resizing");
+      // Possiblity to cache here... if necessary.
+      ctrl.imageThumbs = FormatImageList($scope.content); // format images with new number of columns based on screen size.
+      $scope.$apply(); // This is needed here... will occasionally update on its own.
+    });
+
+    var GetNumberOfColumns = function(){
+      var numCols = 2;
+
+      //if($window.innerWidth > tinyScreenMax){
+        numCols = 2;
+      //}
+      if($window.innerWidth > smallScreenMax){
+        numCols = 3;
+      }
+      if($window.innerWidth > mediumScreenMax){
+        numCols = 4;
+      }
+
+      return numCols;
+    };
+
+    var FormatImageList = function(images){
+      var columns = [];
+      var numColumns = GetNumberOfColumns();
+      var rows = Math.ceil(images.length / numColumns);
+
+      var imagesIndex = 0;
+      for (var y = 0; y < rows; y++) {
+        for(var x = 0; x < numColumns; x++, imagesIndex++){
+          if(columns[x] === undefined){
+            columns.push([]);
+          }
+
+          // Break if no projects remaining.
+          if(imagesIndex === images.length) break;
+
+          columns[x].push(images[ imagesIndex ]);
+        }
+      }
+
+      return columns;
+    };
+
+    ctrl.imageThumbs = FormatImageList($scope.content);
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('navigationBar', navigationBar);
+
+  function navigationBar(){
+    return{
+      restrict:'EA',
+      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html'
     };
   }
 })();
@@ -279,12 +412,15 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('navigationBar', navigationBar);
+    .directive('textBlock', textBlock);
 
-  function navigationBar(){
+  function textBlock(){
     return{
       restrict:'EA',
-      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html'
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/textBlock/textBlock.directive.html'
     };
   }
 })();

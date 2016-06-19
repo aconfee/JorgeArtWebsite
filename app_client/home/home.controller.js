@@ -6,10 +6,12 @@
     .module('PortfolioSPAModule')
     .controller('homeController', homeController);
 
-  homeController.$inject = ['$scope', '$window', 'ProjectsGalleryService'];
-  function homeController($scope, $window, ProjectsGalleryService){
+  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsGalleryService'];
+  function homeController($scope, $window, $location, $sce, ProjectsGalleryService){
     var viewModel = this;
-    var currentProjectsCategoryFilter = ProjectsGalleryService.allProjectsFilter;
+    var currentProjectsCategoryFilter = $location.search().category; // Once per 'page load'
+
+    viewModel.showVideo = currentProjectsCategoryFilter === undefined; // Promo on 'all' page.
 
     // TODO: Make the main gallery a directive and pass projectRows into it.
     viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
@@ -22,21 +24,7 @@
       $scope.$apply(); // This is needed here... will occasionally update on its own.
     });
 
-    viewModel.exampleData = {
-      exampleItem: 'Example text from home controller being passed to example-directive.'
-    };
-
-    viewModel.GetProjects = function(categoryFilter){
-      if(categoryFilter != ProjectsGalleryService.allProjectsFilter &&
-        categoryFilter != ProjectsGalleryService.filmProjectsFilter &&
-        categoryFilter != ProjectsGalleryService.artProjectsFilter){
-          console.error("Invalid categoryFilter provided: " + categoryFilter);
-          return;
-      }
-
-      currentProjectsCategoryFilter = categoryFilter;
-      viewModel.projects = ProjectsGalleryService.GetProjects(categoryFilter);
-    };
+    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
   }
 
 })();

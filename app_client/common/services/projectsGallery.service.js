@@ -11,11 +11,11 @@
     var service = this;
 
     var smallScreenMax = 600;
-    var mediumScreenMax = 1000;
+    var mediumScreenMax = 1366;
 
-    service.allProjectsFilter = "ALL";
-    service.filmProjectsFilter = "FILM";
-    service.artProjectsFilter = "ART";
+    service.allProjectsFilter = undefined;
+    service.filmProjectsFilter = "film";
+    service.artProjectsFilter = "art";
 
     ///
     /// Call out to our API to get projects.
@@ -23,6 +23,14 @@
     /// Organize them into rows according to screen size.
     ///
     service.GetProjects = function(category){
+
+      if(category !== service.allProjectsFilter &&
+        category !== service.filmProjectsFilter &&
+        category !== service.artProjectsFilter){
+          console.error("Invalid category provided: " + category);
+          return;
+      }
+
       // Get aspect ratio and store in db when uploaded.
       // Replace with $http call.
       // build another document of data consisting of specific project page.. all
@@ -33,47 +41,47 @@
           "name": "NoMansSky", // could be useful
           "image": "/images/NoMan1.jpg",
           "aspect": 0.665,
-          "category": "FILM"
+          "category": "film"
         },
         {
           "id": "101",
           "name": "NoMansSky2",
           "image": "/images/NoMan2.jpg",
           "aspect": 1.78,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "102",
           "name": "NoMansSky3",
           "image": "/images/NoMan3.jpg",
           "aspect": 1.77,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "103",
           "name": "NoMansSky4",
           "image": "/images/NoMan4.jpg",
           "aspect": 1.77,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "104",
           "name": "NoMansSky5",
           "image": "/images/NoMan5.jpeg",
           "aspect": 1.777,
-          "category": "ART"
+          "category": "art"
         },
         {
           "id": "105",
           "name": "NoMansSky6",
           "image": "/images/NoMan6.jpg",
           "aspect": 1.77,
-          "category": "FILM"
+          "category": "film"
         }
       ];
 
       var filteredProjectsList = FilterProjectsByCategory(projectsDto, category);
-      return MapProjectsDtoToVm(filteredProjectsList);
+      return service.MapProjectsDtoToVm(filteredProjectsList);
     };
 
     ///
@@ -118,7 +126,7 @@
     /// Take an array of projects and map them to a 2D array of relevent
     /// project info to be used by the view.
     ///
-    var MapProjectsDtoToVm = function(projects){
+    service.MapProjectsDtoToVm = function(projects){
       if(projects === undefined){
         console.error("projects is undefined.");
         return;
@@ -135,24 +143,24 @@
       }
 
       var rowSize = GetRowSize();
-      var projectGroups = [];
+      var projectRows = [];
       var rows = projects.length / rowSize;
 
       if(rows === 0) rows = 1;
 
+      var projectsIndex = 0;
       for (var y = 0; y < rows; y++) {
-        projectGroups.push([]);
+        projectRows.push([]);
 
-        for(var x = 0; x < rowSize; x++){
+        for(var x = 0; x < rowSize; x++, projectsIndex++){
           // Break if no projects remaining.
-          var projectsIndex = (rowSize * y) + x;
           if(projectsIndex === projects.length) break;
 
-          projectGroups[y].push(projects[ projectsIndex ]);
+          projectRows[y].push(projects[ projectsIndex ]);
         }
       }
 
-      return projectGroups;
+      return projectRows;
     };
 
   }

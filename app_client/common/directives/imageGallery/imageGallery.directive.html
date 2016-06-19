@@ -1,0 +1,7 @@
+<div class="gallery-thumb-container">
+  <div class="gallery-thumb-column" ng-repeat="thumbColumn in ctrl.imageThumbs">
+    <div class="gallery-thumb-item" ng-repeat="image in thumbColumn">
+      <img src="{{image}}" ng-click="ctrl.GalleryThumbClick();"/>
+    </div>
+  </div>
+</div>
