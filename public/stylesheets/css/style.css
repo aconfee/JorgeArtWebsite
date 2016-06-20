@@ -49,7 +49,12 @@ a {
   font-size: 1.25em;
   color: black; }
 
-.project-page-container {
+.page-container, .home-page-container, .project-page-container {
   width: 100%;
-  max-width: 2000px;
   margin: 0 auto; }
+
+.home-page-container {
+  max-width: 2000px; }
+
+.project-page-container {
+  max-width: 1600px; }

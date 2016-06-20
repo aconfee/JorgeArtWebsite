@@ -66,8 +66,17 @@ a{
   color:black;
 }
 
-.project-page-container{
+.page-container{
   width:100%;
-  max-width: 2000px;
   margin:0 auto;
+}
+
+.home-page-container{
+	@extend .page-container;
+	max-width:2000px;
+}
+
+.project-page-container{
+	@extend .page-container;
+	max-width:1600px;
 }

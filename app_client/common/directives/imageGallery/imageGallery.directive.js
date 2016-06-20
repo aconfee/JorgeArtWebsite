@@ -25,9 +25,7 @@
     var tinyScreenMax = 600;
     var smallScreenMax = 650;
     var mediumScreenMax = 1000;
-    var largeScreenMax = 1500;
-    var hugeScreenMax = 2000;
-    // Page container stops at 1200.
+    // Never really want more than 4 columns or balance starts to look shit.
 
     ctrl.GalleryThumbClick = function(){
       console.log("thumb clicked!");
@@ -51,12 +49,6 @@
       }
       if($window.innerWidth > mediumScreenMax){
         numCols = 4;
-      }
-      if($window.innerWidth > largeScreenMax){
-        numCols = 5;
-      }
-      if($window.innerWidth > hugeScreenMax){
-        numCols = 6;
       }
 
       return numCols;
