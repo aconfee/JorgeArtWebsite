@@ -96,6 +96,7 @@ function aboutController($scope){
     viewModel.text = "No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block. No mans sky is a diddy I worked on. This is a text block.";
     viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/kF0FvsDNjrc");
     viewModel.otherVideoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.coverImage = "/images/NoMan2.jpg";
     viewModel.galleryThumbs = [
         "/images/NoMan1.jpg",
         "/images/NoMan2.jpg",
@@ -287,13 +288,29 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('coverImage', coverImage);
+
+  function coverImage(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('embededVideo', embededVideo);
 
   function embededVideo(){
     return{
       restrict:'EA',
       scope:{
-        link: '=link'
+        embededUrl: '=embededUrl'
       },
       templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
     };

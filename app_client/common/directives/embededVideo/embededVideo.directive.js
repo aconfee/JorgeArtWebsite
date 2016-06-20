@@ -7,7 +7,7 @@
     return{
       restrict:'EA',
       scope:{
-        link: '=link'
+        embededUrl: '=embededUrl'
       },
       templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
     };

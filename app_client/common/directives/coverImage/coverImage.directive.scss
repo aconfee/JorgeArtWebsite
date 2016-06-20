@@ -1,0 +1,14 @@
+.cover-image-container{
+  display:flex;
+  width:100%;
+  padding:5px;
+}
+
+.cover-image{
+  flex:1;
+
+  img{
+    width:100%;
+    height:auto;
+  }
+}

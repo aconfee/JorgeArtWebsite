@@ -1,6 +1,14 @@
+/* Firefox uses .ttf. Must include web kit for fonts to work.*/
+@font-face {
+  font-family: 'openSansLight';
+  src: url("/fonts/opensans/opensans_light_macroman/OpenSans-Light-webfont.eot");
+  src: url("/fonts/opensans/opensans_light_macroman/OpenSans-Light-webfont.eot?iefix") format("eot"), url("/fonts/opensans/opensans_light_macroman/OpenSans-Light-webfont.woff") format("woff"), url("/fonts/opensans/opensans_light_macroman/OpenSans-Light-webfont.ttf") format("truetype"), url("/fonts/opensans/opensans_light_macroman/OpenSans-Light-webfont.svg#webfont") format("svg"); }
+
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+  font-size: 1.7em;
+  color: #232323;
+  font-family: "openSansLight", "Oxygen", sans-serif; }
 
 a {
   color: #00B7FF;
@@ -42,5 +50,6 @@ a {
   color: black; }
 
 .project-page-container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto; }
