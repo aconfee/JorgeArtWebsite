@@ -129,8 +129,8 @@ function aboutController($scope){
   function ProjectsGalleryService($window){
     var service = this;
 
-    var smallScreenMax = 600;
-    var mediumScreenMax = 1366;
+    var smallScreenMax = 900;
+    var mediumScreenMax = 1500;
 
     service.allProjectsFilter = undefined;
     service.filmProjectsFilter = "film";
@@ -288,38 +288,6 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('coverImage', coverImage);
-
-  function coverImage(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
-
-  function embededVideo(){
-    return{
-      restrict:'EA',
-      scope:{
-        embededUrl: '=embededUrl'
-      },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
     .controller('imageGalleryController', imageGalleryController)
     .directive('imageGallery', imageGallery);
 
@@ -344,6 +312,8 @@ function aboutController($scope){
     var tinyScreenMax = 600;
     var smallScreenMax = 650;
     var mediumScreenMax = 1000;
+    var largeScreenMax = 1500;
+    var hugeScreenMax = 2000;
     // Page container stops at 1200.
 
     ctrl.GalleryThumbClick = function(){
@@ -368,6 +338,12 @@ function aboutController($scope){
       }
       if($window.innerWidth > mediumScreenMax){
         numCols = 4;
+      }
+      if($window.innerWidth > largeScreenMax){
+        numCols = 5;
+      }
+      if($window.innerWidth > hugeScreenMax){
+        numCols = 6;
       }
 
       return numCols;
@@ -422,6 +398,38 @@ function aboutController($scope){
     return{
       restrict:'EA',
       templateUrl: '/common/directives/pageBreak/underline.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('embededVideo', embededVideo);
+
+  function embededVideo(){
+    return{
+      restrict:'EA',
+      scope:{
+        embededUrl: '=embededUrl'
+      },
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('coverImage', coverImage);
+
+  function coverImage(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
     };
   }
 })();

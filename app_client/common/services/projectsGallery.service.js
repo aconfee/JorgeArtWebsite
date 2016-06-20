@@ -10,8 +10,8 @@
   function ProjectsGalleryService($window){
     var service = this;
 
-    var smallScreenMax = 600;
-    var mediumScreenMax = 1366;
+    var smallScreenMax = 900;
+    var mediumScreenMax = 1500;
 
     service.allProjectsFilter = undefined;
     service.filmProjectsFilter = "film";
