@@ -8,7 +8,8 @@
     return{
       restrict:'EA',
       scope:{
-        content: '=content'
+        content: '=content',
+        selectedImage: '=selectedImage'
       },
       templateUrl: '/common/directives/imageGallery/imageGallery.directive.html',
       controller: imageGalleryController,
@@ -26,9 +27,11 @@
     var smallScreenMax = 650;
     var mediumScreenMax = 1000;
     // Never really want more than 4 columns or balance starts to look shit.
+    ctrl.lightboxImage = "";
 
-    ctrl.GalleryThumbClick = function(){
-      console.log("thumb clicked!");
+    ctrl.GalleryThumbClick = function(image){
+      // Set modal image
+      $scope.selectedImage = image;
     };
 
     angular.element($window).bind('resize', function () {

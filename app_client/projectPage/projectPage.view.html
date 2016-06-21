@@ -1,11 +1,14 @@
 <navigation-bar></navigation-bar>
 <div class="project-page-container">
+<h1>Project {{ viewModel.projectId }}</h1>
 
-  <embeded-video embeded-url="viewModel.videoLink"></embeded-video>
-  <text-block content="viewModel.text"></text-block>
-  <underline-page-break></underline-page-break>
-  <cover-image content="viewModel.coverImage"></cover-image>
-  <image-gallery content="viewModel.galleryThumbs"></image-gallery>
-  <underline-page-break></underline-page-break>
-  <text-block content="viewModel.text"></text-block>
+  <div ng-repeat="item in viewModel.blogItems">
+    <embeded-video ng-if="item.type === 'video'" embeded-url="item.source"></embeded-video>
+    <text-block ng-if="item.type === 'text'" content="item.text"></text-block>
+    <underline-page-break ng-if="item.type === 'pageBreak'"></underline-page-break>
+    <cover-image ng-if="item.type === 'coverImage'" content="item.source"></cover-image>
+    <image-gallery ng-if="item.type === 'gallery'" content="item.imageList" selected-image="viewModel.lightboxImage"></image-gallery>
+  </div>
 </div>
+
+<image-lightbox content="viewModel.lightboxImage"></image-lightbox>

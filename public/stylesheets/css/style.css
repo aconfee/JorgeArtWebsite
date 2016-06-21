@@ -30,13 +30,13 @@ a {
   position: absolute;
   top: 0;
   left: 0;
+  background-color: white;
   opacity: 0;
   transition: opacity .15s ease-in-out;
   -moz-transition: opacity .15s ease-in-out;
   -webkit-transition: opacity .15s ease-in-out; }
 
 .project-cover-image:hover {
-  background-color: white;
   opacity: 0.8; }
 
 .project-cover-text {

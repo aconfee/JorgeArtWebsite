@@ -1,7 +1,10 @@
+<!-- DEPENDENCY: Must use together with the image-lightbox directive. GalleryThumbClick binds the selected image with the outside caller -->
+
 <div class="gallery-thumb-container">
   <div class="gallery-thumb-column" ng-repeat="thumbColumn in ctrl.imageThumbs">
-    <div class="gallery-thumb-item" ng-repeat="image in thumbColumn">
-      <img src="{{image}}" ng-click="ctrl.GalleryThumbClick();"/>
+    <div class="gallery-thumb-item" ng-repeat="image in thumbColumn" ng-click="ctrl.GalleryThumbClick(image);" data-toggle="modal" data-target="#lightbox">
+      <img src="{{image}}"/>
+      <div class="thumb-hover-screen"></div>
     </div>
   </div>
 </div>

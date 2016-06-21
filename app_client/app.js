@@ -20,7 +20,7 @@
         controller: 'aboutController',
         controllerAs: 'viewModel'
       })
-      .when('/projects/100', {
+      .when('/projects/:projectid', {
         templateUrl: 'projectPage/projectPage.view.html',
         controller: 'projectPageController',
         controllerAs: 'viewModel'
