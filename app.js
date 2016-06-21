@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 // No need to route outside API since using SPA.
 //var routes = require('./app_server/routes/index');
+var apiRoutes = require('./api/routes/index');
 
 var app = express();
 
@@ -29,6 +30,9 @@ app.use(require('node-sass-middleware')({
   indentedSyntax: true,
   sourceMap: true
 }));
+
+// API
+app.use('/api', apiRoutes);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
