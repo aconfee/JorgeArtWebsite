@@ -6,25 +6,33 @@
     .module('PortfolioSPAModule')
     .controller('homeController', homeController);
 
-  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsGalleryService'];
-  function homeController($scope, $window, $location, $sce, ProjectsGalleryService){
+  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsService'];
+  function homeController($scope, $window, $location, $sce, ProjectsService){
     var viewModel = this;
-    var currentProjectsCategoryFilter = $location.search().category; // Once per 'page load'
-
-    viewModel.showVideo = currentProjectsCategoryFilter === undefined; // Promo on 'all' page.
-
-    // TODO: Make the main gallery a directive and pass projectRows into it.
-    viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
-
-    // Turn into a service to return screen width and height.
-    // This service should have a method to just get num of rows that should display.
-    angular.element($window).bind('resize', function () {
-      // Possiblity to cache here... if necessary.
-      viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
-      $scope.$apply(); // This is needed here... will occasionally update on its own.
-    });
+    var categoryFilter = $location.search().category; // Once per 'page load'
 
     viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
+
+    ///
+    /// Request the projects to disply on the home page.
+    ///
+    ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+      viewModel.projects = projectsVm;
+    });
+
+    ///
+    /// Re-get the projects if page is resized (getting projects will rebuild the rows
+    /// according to screen size).
+    /// TODO: Only get projects when resizing is done so we're not making a million calls.
+    ///
+    angular.element($window).bind('resize', function () {
+      // Possiblity to cache here... if necessary.
+      ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+        viewModel.projects = projectsVm;
+        //$scope.$apply(); // Not needed... two way bind automatically digests.
+      });
+    });
   }
 
 })();

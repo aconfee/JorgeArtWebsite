@@ -38,48 +38,6 @@
 
 })();
 
-angular
-  .module('PortfolioSPAModule')
-  .controller('aboutController', aboutController);
-
-aboutController.$inject = ['$scope'];
-function aboutController($scope){
-  var viewModel = this;
-
-  viewModel.myVariable = "I'm pretty cool, I guess.";
-}
-
-// Using function scopes to prevent global scope variables.
-// God, I can't wait to use typescript.
-(function(){
-
-  angular
-    .module('PortfolioSPAModule')
-    .controller('homeController', homeController);
-
-  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsGalleryService'];
-  function homeController($scope, $window, $location, $sce, ProjectsGalleryService){
-    var viewModel = this;
-    var currentProjectsCategoryFilter = $location.search().category; // Once per 'page load'
-
-    viewModel.showVideo = currentProjectsCategoryFilter === undefined; // Promo on 'all' page.
-
-    // TODO: Make the main gallery a directive and pass projectRows into it.
-    viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
-
-    // Turn into a service to return screen width and height.
-    // This service should have a method to just get num of rows that should display.
-    angular.element($window).bind('resize', function () {
-      // Possiblity to cache here... if necessary.
-      viewModel.projects = ProjectsGalleryService.GetProjects(currentProjectsCategoryFilter);
-      $scope.$apply(); // This is needed here... will occasionally update on its own.
-    });
-
-    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
-  }
-
-})();
-
 (function(){
 
   angular
@@ -93,9 +51,6 @@ function aboutController($scope){
     // Make sure we always start at the top of the page.
     $window.scrollTo(0, 0);
 
-    // DEBUG TODO REMOVE
-    viewModel.projectId = $routeParams.projectid;
-
     ProjectsService.GetProjectPage($routeParams.projectid, function(pageData){
       viewModel.blogItems = pageData;
     });
@@ -103,205 +58,70 @@ function aboutController($scope){
 
 })();
 
+// Using function scopes to prevent global scope variables.
+// God, I can't wait to use typescript.
 (function(){
 
   angular
     .module('PortfolioSPAModule')
-    .service('ProjectsGalleryService', ProjectsGalleryService);
+    .controller('homeController', homeController);
 
+  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsService'];
+  function homeController($scope, $window, $location, $sce, ProjectsService){
+    var viewModel = this;
+    var categoryFilter = $location.search().category; // Once per 'page load'
 
-
-  ProjectsGalleryService.$inject = ['$window'];
-  function ProjectsGalleryService($window){
-    var service = this;
-
-    var smallScreenMax = 900;
-    var mediumScreenMax = 1500;
-
-    service.allProjectsFilter = undefined;
-    service.filmProjectsFilter = "film";
-    service.artProjectsFilter = "art";
+    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
 
     ///
-    /// Call out to our API to get projects.
-    /// Filtr them by the appropriate category.
-    /// Organize them into rows according to screen size.
+    /// Request the projects to disply on the home page.
     ///
-    service.GetProjects = function(category){
-
-      if(category !== service.allProjectsFilter &&
-        category !== service.filmProjectsFilter &&
-        category !== service.artProjectsFilter){
-          console.error("Invalid category provided: " + category);
-          return;
-      }
-
-      // Get aspect ratio and store in db when uploaded.
-      // Replace with $http call.
-      // build another document of data consisting of specific project page.. all
-      // the blog components.
-      var projectsDto = [
-        {
-          "id": "100", // use this to navigate to specific project url
-          "name": "NoMansSky", // could be useful
-          "image": "/images/NoMan1.jpg",
-          "aspect": 0.665,
-          "category": "film"
-        },
-        {
-          "id": "101",
-          "name": "NoMansSky2",
-          "image": "/images/NoMan2.jpg",
-          "aspect": 1.78,
-          "category": "art"
-        },
-        {
-          "id": "102",
-          "name": "NoMansSky3",
-          "image": "/images/NoMan3.jpg",
-          "aspect": 1.77,
-          "category": "art"
-        },
-        {
-          "id": "103",
-          "name": "NoMansSky4",
-          "image": "/images/NoMan4.jpg",
-          "aspect": 1.77,
-          "category": "art"
-        },
-        {
-          "id": "104",
-          "name": "NoMansSky5",
-          "image": "/images/NoMan5.jpeg",
-          "aspect": 1.777,
-          "category": "art"
-        },
-        {
-          "id": "105",
-          "name": "NoMansSky6",
-          "image": "/images/NoMan6.jpg",
-          "aspect": 1.77,
-          "category": "film"
-        }
-      ];
-
-      var filteredProjectsList = FilterProjectsByCategory(projectsDto, category);
-      return service.MapProjectsDtoToVm(filteredProjectsList);
-    };
+    ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+      viewModel.projects = projectsVm;
+    });
 
     ///
-    /// Filter the projects by the provided category.
+    /// Re-get the projects if page is resized (getting projects will rebuild the rows
+    /// according to screen size).
+    /// TODO: Only get projects when resizing is done so we're not making a million calls.
     ///
-    var FilterProjectsByCategory = function(projects, category){
-      var filteredProjects = [];
-
-      if(category === service.allProjectsFilter){
-        return projects;
-      }
-
-      for(var i = 0; i < projects.length; i++){
-        // If the project category matches, add it to our results.
-        if(projects[i].category === category){
-          filteredProjects.push(projects[i]);
-        }
-      }
-
-      return filteredProjects;
-    };
-
-    ///
-    /// Get the number of projects we want to show in a row based on how
-    /// big the screen is.
-    ///
-    var GetRowSize = function(){
-      var rowSize = 1;
-
-      if($window.innerWidth > smallScreenMax){
-        rowSize = 2;
-      }
-
-      if($window.innerWidth > mediumScreenMax){
-        rowSize = 3;
-      }
-
-      return rowSize;
-    };
-
-    ///
-    /// Take an array of projects and map them to a 2D array of relevent
-    /// project info to be used by the view.
-    ///
-    service.MapProjectsDtoToVm = function(projects){
-      if(projects === undefined){
-        console.error("projects is undefined.");
-        return;
-      }
-
-      if(projects.length === 0){
-        console.error("No projects in the projects array.");
-        return;
-      }
-
-      if(Array.isArray(projects) === false){
-        console.error("Array of projects not provided.");
-        return;
-      }
-
-      var rowSize = GetRowSize();
-      var projectRows = [];
-      var rows = projects.length / rowSize;
-
-      if(rows === 0) rows = 1;
-
-      var projectsIndex = 0;
-      for (var y = 0; y < rows; y++) {
-        projectRows.push([]);
-
-        for(var x = 0; x < rowSize; x++, projectsIndex++){
-          // Break if no projects remaining.
-          if(projectsIndex === projects.length) break;
-
-          projectRows[y].push(projects[ projectsIndex ]);
-        }
-      }
-
-      return projectRows;
-    };
-
+    angular.element($window).bind('resize', function () {
+      // Possiblity to cache here... if necessary.
+      ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+        viewModel.projects = projectsVm;
+        //$scope.$apply(); // Not needed... two way bind automatically digests.
+      });
+    });
   }
+
 })();
 
+angular
+  .module('PortfolioSPAModule')
+  .controller('aboutController', aboutController);
+
+aboutController.$inject = ['$scope'];
+function aboutController($scope){
+  var viewModel = this;
+
+  viewModel.myVariable = "I'm pretty cool, I guess.";
+}
+
 (function(){
 
   angular
     .module('PortfolioSPAModule')
-    .service('ProjectsService', ProjectsService);
+    .service('DataMappingService', DataMappingService);
 
-  ProjectsService.$inject = ['$sce', '$http'];
-  function ProjectsService($sce, $http){
+  DataMappingService.$inject = ['$sce', 'ResponsiveService'];
+  function DataMappingService($sce, ResponsiveService){
     var service = this;
-
-    ///
-    /// Get a project page by its id.
-    ///
-    service.GetProjectPage = function(projectId, callback){
-
-      $http.get('/api/projects/' + projectId).then(
-        function(response){
-          if(response.status === 200){
-            callback(MapProjectDataToVm(response.data));
-          }
-        },
-        function(response){
-          console.error("Something went wrong getting project page " + projectId);
-          // TODO: Redirect to 404 not found.
-      });
-    };
 
     ///
     /// Map the data returned by a project page to its view model.
     ///
-    var MapProjectDataToVm = function(data){
+     service.MapProjectDataToProjectPageVm = function(data){
       var blogItems = [];
 
       var i = 0;
@@ -334,6 +154,162 @@ function aboutController($scope){
 
       return blogItems;
     };
+
+    ///
+    /// Take an array of projects and map them to a 2D array of relevent
+    /// project info to be used by the view.
+    ///
+    service.MapProjectsDataToHomePageVm = function(projects){
+      if(projects === undefined){
+        console.error("projects is undefined.");
+        return;
+      }
+
+      if(projects.length === 0){
+        console.error("No projects in the projects array.");
+        return;
+      }
+
+      if(Array.isArray(projects) === false){
+        console.error("Array of projects not provided.");
+        return;
+      }
+
+      var rowSize = ResponsiveService.GetHomePageRowSize();
+      var projectRows = [];
+      var rows = projects.length / rowSize;
+
+      if(rows === 0) rows = 1;
+
+      var projectsIndex = 0;
+      for (var y = 0; y < rows; y++) {
+        projectRows.push([]);
+
+        for(var x = 0; x < rowSize; x++, projectsIndex++){
+          // Break if no projects remaining.
+          if(projectsIndex === projects.length) break;
+
+          projectRows[y].push(projects[ projectsIndex ]);
+        }
+      }
+
+      return projectRows;
+    };
+
+  }
+
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .service('ProjectsService', ProjectsService);
+
+  ProjectsService.$inject = ['$sce', '$http', 'DataMappingService'];
+  function ProjectsService($sce, $http, DataMappingService){
+    var service = this;
+
+    service.allProjectsFilter = undefined;
+    service.filmProjectsFilter = "film";
+    service.artProjectsFilter = "art";
+
+    ///
+    /// Get a project page by its id.
+    ///
+    service.GetProjectPage = function(projectId, callback){
+
+      $http.get('/api/projects/' + projectId).then(
+        function(response){
+          if(response.status === 200){
+            callback(DataMappingService.MapProjectDataToProjectPageVm(response.data));
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting project page " + projectId);
+          // TODO: Redirect to 404 not found.
+      });
+    };
+
+    ///
+    /// Get all projects as they are needed on the home page.
+    ///
+    service.GetProjectsHomePage = function(category, callback){
+
+      if(category !== service.allProjectsFilter &&
+        category !== service.filmProjectsFilter &&
+        category !== service.artProjectsFilter){
+          console.error("Invalid category provided: " + category);
+          return;
+      }
+
+      $http.get('/api/projects/').then(
+        function(response){
+          if(response.status === 200){
+            var filteredProjectsList = FilterProjectsByCategory(response.data.projects, category);
+            var mapped =  DataMappingService.MapProjectsDataToHomePageVm(filteredProjectsList);
+
+            callback(mapped);
+          }
+        },
+        function(response){
+          console.log("Something went wrong while getting all projects.");
+      });
+    };
+
+    ///
+    /// Filter the projects by the provided category.
+    ///
+    var FilterProjectsByCategory = function(projects, category){
+      var filteredProjects = [];
+
+      if(category === service.allProjectsFilter){
+        return projects;
+      }
+
+      for(var i = 0; i < projects.length; i++){
+        // If the project category matches, add it to our results.
+        if(projects[i].category === category){
+          filteredProjects.push(projects[i]);
+        }
+      }
+
+      return filteredProjects;
+    };
+  }
+
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .service('ResponsiveService', ResponsiveService);
+
+  ResponsiveService.$inject = ['$window'];
+  function ResponsiveService($window){
+    var service = this;
+
+    var smallScreenMax = 900;
+    var mediumScreenMax = 1500;
+
+    ///
+    /// Get the number of projects we want to show in a row based on how
+    /// big the screen is.
+    ///
+    service.GetHomePageRowSize = function(){
+      var rowSize = 1;
+
+      if($window.innerWidth > smallScreenMax){
+        rowSize = 2;
+      }
+
+      if($window.innerWidth > mediumScreenMax){
+        rowSize = 3;
+      }
+
+      return rowSize;
+    };
   }
 
 })();
@@ -357,15 +333,15 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
+    .directive('imageLightbox', imageLightbox);
 
-  function embededVideo(){
+  function imageLightbox(){
     return{
       restrict:'EA',
       scope:{
-        embededUrl: '=embededUrl'
+        content: '=content'
       },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
     };
   }
 })();
@@ -459,15 +435,15 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
+    .directive('embededVideo', embededVideo);
 
-  function imageLightbox(){
+  function embededVideo(){
     return{
       restrict:'EA',
       scope:{
-        content: '=content'
+        embededUrl: '=embededUrl'
       },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
     };
   }
 })();

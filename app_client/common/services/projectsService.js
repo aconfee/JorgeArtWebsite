@@ -4,9 +4,13 @@
     .module('PortfolioSPAModule')
     .service('ProjectsService', ProjectsService);
 
-  ProjectsService.$inject = ['$sce', '$http'];
-  function ProjectsService($sce, $http){
+  ProjectsService.$inject = ['$sce', '$http', 'DataMappingService'];
+  function ProjectsService($sce, $http, DataMappingService){
     var service = this;
+
+    service.allProjectsFilter = undefined;
+    service.filmProjectsFilter = "film";
+    service.artProjectsFilter = "art";
 
     ///
     /// Get a project page by its id.
@@ -16,7 +20,7 @@
       $http.get('/api/projects/' + projectId).then(
         function(response){
           if(response.status === 200){
-            callback(MapProjectDataToVm(response.data));
+            callback(DataMappingService.MapProjectDataToProjectPageVm(response.data));
           }
         },
         function(response){
@@ -26,40 +30,49 @@
     };
 
     ///
-    /// Map the data returned by a project page to its view model.
+    /// Get all projects as they are needed on the home page.
     ///
-    var MapProjectDataToVm = function(data){
-      var blogItems = [];
+    service.GetProjectsHomePage = function(category, callback){
 
-      var i = 0;
-      for(i = 0; i < data.videos.length; i++){
-        // Trust the link provided and add.
-        data.videos[i].source = $sce.trustAsResourceUrl(data.videos[i].source);
-        blogItems.push(data.videos[i]);
+      if(category !== service.allProjectsFilter &&
+        category !== service.filmProjectsFilter &&
+        category !== service.artProjectsFilter){
+          console.error("Invalid category provided: " + category);
+          return;
       }
 
-      for(i = 0; i < data.textBlocks.length; i++){
-        blogItems.push(data.textBlocks[i]);
-      }
+      $http.get('/api/projects/').then(
+        function(response){
+          if(response.status === 200){
+            var filteredProjectsList = FilterProjectsByCategory(response.data.projects, category);
+            var mapped =  DataMappingService.MapProjectsDataToHomePageVm(filteredProjectsList);
 
-      for(i = 0; i < data.coverImages.length; i++){
-        blogItems.push(data.coverImages[i]);
-      }
-
-      for(i = 0; i < data.galleries.length; i++){
-        blogItems.push(data.galleries[i]);
-      }
-
-      for(i = 0; i < data.pageBreaks.length; i++){
-        blogItems.push(data.pageBreaks[i]);
-      }
-
-      // Sort the list by position
-      blogItems.sort(function(a, b) {
-        return a.position > b.position;
+            callback(mapped);
+          }
+        },
+        function(response){
+          console.log("Something went wrong while getting all projects.");
       });
+    };
 
-      return blogItems;
+    ///
+    /// Filter the projects by the provided category.
+    ///
+    var FilterProjectsByCategory = function(projects, category){
+      var filteredProjects = [];
+
+      if(category === service.allProjectsFilter){
+        return projects;
+      }
+
+      for(var i = 0; i < projects.length; i++){
+        // If the project category matches, add it to our results.
+        if(projects[i].category === category){
+          filteredProjects.push(projects[i]);
+        }
+      }
+
+      return filteredProjects;
     };
   }
 

@@ -1,6 +1,51 @@
 module.exports.getAllProjects = function(req, res){
   res.status(200);
-  res.json({"text": "get all projects"});
+
+  var projectsDto = {"projects": [
+    {
+      "id": "100", // use this to navigate to specific project url
+      "name": "NoMansSky", // could be useful
+      "image": "/images/NoMan1.jpg",
+      "aspect": 0.665,
+      "category": "film"
+    },
+    {
+      "id": "101",
+      "name": "NoMansSky2",
+      "image": "/images/NoMan2.jpg",
+      "aspect": 1.78,
+      "category": "art"
+    },
+    {
+      "id": "102",
+      "name": "NoMansSky3",
+      "image": "/images/NoMan3.jpg",
+      "aspect": 1.77,
+      "category": "art"
+    },
+    {
+      "id": "103",
+      "name": "NoMansSky4",
+      "image": "/images/NoMan4.jpg",
+      "aspect": 1.77,
+      "category": "art"
+    },
+    {
+      "id": "104",
+      "name": "NoMansSky5",
+      "image": "/images/NoMan5.jpeg",
+      "aspect": 1.777,
+      "category": "art"
+    },
+    {
+      "id": "105",
+      "name": "NoMansSky6",
+      "image": "/images/NoMan6.jpg",
+      "aspect": 1.77,
+      "category": "film"
+    }
+  ]};
+  res.json(projectsDto);
 };
 
 module.exports.createProject = function(req, res){
@@ -39,6 +84,7 @@ module.exports.getProject = function(req, res){
   // As a bonus, Jorge will be able to update the position value for any of these.
   var dataBlob = {
     "id": "200",
+    "position": 1,
     "name": "No Mans Sky",
     "category": "film",
     "projectCoverImage": "/images/NoMan5.jpeg",
