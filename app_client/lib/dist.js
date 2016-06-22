@@ -38,25 +38,16 @@
 
 })();
 
-(function(){
+angular
+  .module('PortfolioSPAModule')
+  .controller('aboutController', aboutController);
 
-  angular
-    .module('PortfolioSPAModule')
-    .controller('projectPageController', projectPageController);
+aboutController.$inject = ['$scope'];
+function aboutController($scope){
+  var viewModel = this;
 
-  projectPageController.$inject = ['$window', '$routeParams', 'ProjectsService'];
-  function projectPageController($window, $routeParams, ProjectsService){
-    var viewModel = this;
-
-    // Make sure we always start at the top of the page.
-    $window.scrollTo(0, 0);
-
-    ProjectsService.GetProjectPage($routeParams.projectid, function(pageData){
-      viewModel.blogItems = pageData;
-    });
-  }
-
-})();
+  viewModel.myVariable = "I'm pretty cool, I guess.";
+}
 
 // Using function scopes to prevent global scope variables.
 // God, I can't wait to use typescript.
@@ -97,16 +88,27 @@
 
 })();
 
-angular
-  .module('PortfolioSPAModule')
-  .controller('aboutController', aboutController);
+(function(){
 
-aboutController.$inject = ['$scope'];
-function aboutController($scope){
-  var viewModel = this;
+  angular
+    .module('PortfolioSPAModule')
+    .controller('projectPageController', projectPageController);
 
-  viewModel.myVariable = "I'm pretty cool, I guess.";
-}
+  projectPageController.$inject = ['$window', '$routeParams', 'ProjectsService'];
+  function projectPageController($window, $routeParams, ProjectsService){
+    var viewModel = this;
+
+    viewModel.projectId = $routeParams.projectid;
+
+    // Make sure we always start at the top of the page.
+    $window.scrollTo(0, 0);
+
+    ProjectsService.GetProjectPage($routeParams.projectid, function(pageData){
+      viewModel.blogItems = pageData;
+    });
+  }
+
+})();
 
 (function(){
 
@@ -333,15 +335,15 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
+    .directive('embededVideo', embededVideo);
 
-  function imageLightbox(){
+  function embededVideo(){
     return{
       restrict:'EA',
       scope:{
-        content: '=content'
+        embededUrl: '=embededUrl'
       },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
     };
   }
 })();
@@ -435,15 +437,15 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
+    .directive('imageLightbox', imageLightbox);
 
-  function embededVideo(){
+  function imageLightbox(){
     return{
       restrict:'EA',
       scope:{
-        embededUrl: '=embededUrl'
+        content: '=content'
       },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
     };
   }
 })();

@@ -8,6 +8,8 @@
   function projectPageController($window, $routeParams, ProjectsService){
     var viewModel = this;
 
+    viewModel.projectId = $routeParams.projectid;
+
     // Make sure we always start at the top of the page.
     $window.scrollTo(0, 0);
 
