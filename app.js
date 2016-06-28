@@ -1,9 +1,14 @@
+require('dotenv').load();
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var passport = require('passport'); // Must be placed before schema defined.
+
+require('./api/models/db');
+require('./api/config/passport'); // Must be placed after schema defined.
 
 // No need to route outside API since using SPA.
 //var routes = require('./app_server/routes/index');
@@ -31,15 +36,17 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }));
 
-// API
-app.use('/api', apiRoutes);
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve our app to the browser. The Express static function will automatically
 // default to any file called 'index'. So our angular index template is defaulted
 // to without routing.
 app.use(express.static(path.join(__dirname, 'app_client')));
+
+app.use(passport.initialize()); // Initialize passport after static routes defined, but before routes that need authentication are used.
+
+// API
+app.use('/api', apiRoutes); // These routes will use the authentication above.
 
 // Don't do routing through Express since using SPA.
 //app.use('/', routes);
@@ -48,6 +55,14 @@ app.use(express.static(path.join(__dirname, 'app_client')));
 // by Angular. So be sure to redirect everything back to Angular to handle.
 app.use(function(req, res){
   res.sendfile(path.join(__dirname, 'app_client', 'index.html'));
+});
+
+// Unauthorized user trying to access secure api.
+app.use(function(err, req, res, next){
+  if(err.name === 'UnauthorizedError'){
+    res.status(401);
+    res.json({"message": err.name + ": " + err.message});
+  }
 });
 
 // catch 404 and forward to error handler

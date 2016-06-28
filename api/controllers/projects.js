@@ -1,3 +1,6 @@
+var mongoose = require('mongoose');
+var Project = mongoose.model('Project');
+
 module.exports.getAllProjects = function(req, res){
   res.status(200);
 
@@ -204,8 +207,64 @@ module.exports.getAllProjects = function(req, res){
 };
 
 module.exports.createProject = function(req, res){
-  res.status(200);
-  res.json({"text": "create a project"});
+  console.log("CREATING A NEW PROJECT!@!!!!!");
+
+    Project.create({
+      name: "Baller Project",
+      position: 0,
+      category: "film",
+      projectCoverImage: "/images/NoMan4.jpg",
+      projectCoverImageAspectRatio: 1.777,
+      pageItems: [{
+        position: 0,
+        type: "video",
+        content: "https://www.youtube.com/embed/c7nRTF2SowQ"
+      }, {
+        position: 1,
+        type: "text",
+        content: "I'm so excited for this game!"
+      }, {
+        position: 2,
+        type: "coverImage",
+        content: "/images/LastOf4.jpg"
+      }, {
+        position: 3,
+        type: "gallery",
+        contentArray: [
+          "/images/NoMan1.jpg",
+          "/images/NoMan2.jpg",
+          "/images/NoMan3.jpg",
+          "/images/NoMan4.jpg",
+          "/images/NoMan5.jpeg",
+          "/images/NoMan6.jpg",
+          "/images/LastOf1.jpg",
+          "/images/LastOf2.jpg",
+          "/images/LastOf3.jpg",
+          "/images/LastOf4.jpg",
+          "/images/LastOf5.jpg",
+          "/images/LastOf6.jpg",
+          "/images/LastOf7.jpg",
+          "/images/LastOf8.jpg"
+        ]
+      }, {
+        position: 4,
+        type: "pageBreak"
+      }, {
+        position: 5,
+        type: "text",
+        content: "Here's a gallery of things I drool over."
+      }]
+    }, function(err, project) {
+      if (err) {
+        console.log(err);
+        res.status(400);
+        res.json(err);
+      } else {
+        console.log(project);
+        res.status(201);
+        res.json(project);
+      }
+    });
 };
 
 module.exports.getProject = function(req, res){

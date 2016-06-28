@@ -1,0 +1,13 @@
+<h1>Admin Page</h1>
+
+<div class="col-md-6 col-sm-8">
+  <form ng-submit="viewModel.createProject()">
+    <div role="alert" ng-show="viewModel.formError" class="alert alert-danger">
+      {{ viewModel.formError }}
+    </div>
+    <button type="submit" class="btn btn-default">Create Project</button></button>
+  </form>
+  <form ng-submit="viewModel.logout()">
+    <button type="submit" class="btn btn-default">Logout</button></button>
+  </form>
+</div>

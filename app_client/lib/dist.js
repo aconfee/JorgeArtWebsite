@@ -25,6 +25,16 @@
         controller: 'projectPageController',
         controllerAs: 'viewModel'
       })
+      .when('/login', {
+        templateUrl: '/login/login.view.html',
+        controller: 'loginCtrl',
+        controllerAs: 'viewModel'
+      })
+      .when('/admin', {
+        templateUrl: '/admin/admin.view.html',
+        controller: 'adminController',
+        controllerAs: 'viewModel'
+      })
       .otherwise({redirectTo: '/'});
 
     // Pretty up URLs. Base defined in index.html.
@@ -47,6 +57,42 @@ function aboutController($scope){
   var viewModel = this;
 
   viewModel.myVariable = "I'm pretty cool, I guess.";
+}
+
+angular
+  .module('PortfolioSPAModule')
+  .controller('adminController', adminController);
+
+adminController.$inject = ['$location', '$http', 'authentication'];
+function adminController($location, $http, authentication){
+  var viewModel = this;
+
+  // Immediatelly check if a user is logged in, otherwise leave.
+  if(authentication.isLoggedIn() === false){
+    $location.path('/');
+  }
+
+  viewModel.formError = "";
+
+  viewModel.createProject = function(){
+    $http.post('/api/projects', {lol: "data"}, {
+      headers: {
+        Authorization: 'Bearer ' + authentication.getToken()
+      }
+    }).then(
+      function(response){
+        viewModel.formError = "Project created!";
+      },
+      function(response){
+        viewModel.formError = "Something went wrong trying to create project. " + response.data.message;
+      }
+    );
+  };
+
+  viewModel.logout = function(){
+    authentication.logout();
+    $location.path('/');
+  };
 }
 
 // Using function scopes to prevent global scope variables.
@@ -88,6 +134,49 @@ function aboutController($scope){
 
 })();
 
+angular
+  .module('PortfolioSPAModule')
+  .controller('loginCtrl', loginCtrl);
+
+loginCtrl.$inject = ['$location', 'authentication'];
+function loginCtrl($location, authentication){
+  var viewModel = this;
+
+  viewModel.pageHeader = {
+    title: 'Admin Sign In'
+  };
+
+  viewModel.credentials = {
+    username: "",
+    password: ""
+  };
+
+  viewModel.returnPage = '/admin'; // Go to admin page once logged in.
+  viewModel.onSubmit = function(){
+    viewModel.formError = "";
+    if(!viewModel.credentials.username || !viewModel.credentials.password){
+      viewModel.formError = "All fields required.";
+      return false;
+    }
+    else{
+      viewModel.doLogin();
+    }
+  };
+
+  viewModel.doLogin = function(){
+    viewModel.formError = "";
+    authentication
+      .login(viewModel.credentials)
+      .error(function(err){
+        viewModel.formError = err.message;
+      })
+      .then(function(){
+        //$location.search('page', null); no need to get query param for return page.
+        $location.path(viewModel.returnPage);
+      });
+  };
+}
+
 (function(){
 
   angular
@@ -108,6 +197,64 @@ function aboutController($scope){
     });
   }
 
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .service('authentication', authentication);
+
+    authentication.$inject = ['$window', '$http'];
+    function authentication($window, $http){
+      var saveToken = function(token){
+        $window.localStorage['admin-token'] = token;
+      };
+
+      var getToken = function(){
+        return $window.localStorage['admin-token'];
+      };
+
+      var login = function(user){
+        return $http.post('/api/login', user).success(function(data){
+          saveToken(data.token);
+        });
+      };
+
+      var logout = function(){
+        $window.localStorage.removeItem('admin-token');
+      };
+
+      var isLoggedIn = function(){
+        var token = getToken();
+
+        if(token){
+          var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+          return payload.exp > Date.now() / 1000;
+        }
+        else{
+          return false;
+        }
+      };
+
+      var currentUser = function(){
+        if(isLoggedIn()){
+          var token = getToken();
+          var payload = JSON.parse($window.atob(token.split('.')[1]));
+          return {
+            username: payload.username
+          };
+        }
+      };
+
+      return {
+        login: login,
+        logout: logout,
+        isLoggedIn: isLoggedIn,
+        saveToken: saveToken,
+        getToken: getToken
+      };
+    }
 })();
 
 (function(){
@@ -437,22 +584,6 @@ function aboutController($scope){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
-
-  function imageLightbox(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
     .directive('navigationBar', navigationBar);
 
   function navigationBar(){
@@ -488,6 +619,22 @@ function aboutController($scope){
         content: '=content'
       },
       templateUrl: '/common/directives/textBlock/textBlock.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('imageLightbox', imageLightbox);
+
+  function imageLightbox(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
     };
   }
 })();

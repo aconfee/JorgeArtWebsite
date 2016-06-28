@@ -25,6 +25,16 @@
         controller: 'projectPageController',
         controllerAs: 'viewModel'
       })
+      .when('/login', {
+        templateUrl: '/login/login.view.html',
+        controller: 'loginCtrl',
+        controllerAs: 'viewModel'
+      })
+      .when('/admin', {
+        templateUrl: '/admin/admin.view.html',
+        controller: 'adminController',
+        controllerAs: 'viewModel'
+      })
       .otherwise({redirectTo: '/'});
 
     // Pretty up URLs. Base defined in index.html.
