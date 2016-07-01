@@ -31,8 +31,13 @@
         controllerAs: 'viewModel'
       })
       .when('/admin', {
-        templateUrl: '/admin/admin.view.html',
-        controller: 'adminController',
+        templateUrl: '/admin/dashboard/dashboard.view.html',
+        controller: 'dashboardController',
+        controllerAs: 'viewModel'
+      })
+      .when('/admin/newProject', {
+        templateUrl: '/admin/newProject/newProject.view.html',
+        controller: 'newProjectController',
         controllerAs: 'viewModel'
       })
       .otherwise({redirectTo: '/'});

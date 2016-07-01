@@ -1,0 +1,18 @@
+<h1 style="display: inline-block;">Admin Dashboard</h1>
+<form ng-submit="viewModel.logout()" style="float:right; display:inline-block;">
+  <button type="submit" class="btn btn-default">Logout</button></button>
+</form>
+<div style="border: 1px solid silver; width: 100%; margin-bottom: 50px;"></div>
+
+<a href="/admin/newProject">
+  <button style="display:inline-block; margin:5px 0;" class="btn btn-primary">New Project</button>
+</a>
+
+<div style="display:inline-block; width:200px; height:270px; overflow:none; margin:20px;" ng-repeat="project in viewModel.projects">
+  <p>{{ project.name }}</p>
+  <div style="height:150px; width:200px; background-color:yellow">
+      <img style="width:100%; height:100%;" ng-src="{{ project.projectCoverImage }}" />
+  </div>
+  <button style="display:block; width:100%; margin:5px 0;" class="btn btn-primary" ng-click="viewModel.createProject()">Edit</button>
+  <button style="display:block; width:100%; margin:5px 0;" class="btn btn-danger" ng-click="viewModel.createProject()">Delete</button>
+</div>

@@ -13,6 +13,27 @@
     service.artProjectsFilter = "art";
 
     ///
+    /// Get all the projects raw data
+    ///
+    service.GetAllProjects = function(callback){
+      $http.get('/api/projects/').then(
+        function(response){
+          if(response.status === 200){
+
+            response.data.sort(function(a, b) {
+              return a.position > b.position;
+            });
+
+            callback(response.data);
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting all projects.");
+          // TODO: Redirect to 404 not found.
+      });
+    };
+
+    ///
     /// Get a project page by its id.
     ///
     service.GetProjectPage = function(projectId, callback){

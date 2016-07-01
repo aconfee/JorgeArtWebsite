@@ -31,8 +31,13 @@
         controllerAs: 'viewModel'
       })
       .when('/admin', {
-        templateUrl: '/admin/admin.view.html',
-        controller: 'adminController',
+        templateUrl: '/admin/dashboard/dashboard.view.html',
+        controller: 'dashboardController',
+        controllerAs: 'viewModel'
+      })
+      .when('/admin/newProject', {
+        templateUrl: '/admin/newProject/newProject.view.html',
+        controller: 'newProjectController',
         controllerAs: 'viewModel'
       })
       .otherwise({redirectTo: '/'});
@@ -47,106 +52,6 @@
     .config(['$routeProvider', '$locationProvider', config]);
 
 })();
-
-angular
-  .module('PortfolioSPAModule')
-  .controller('aboutController', aboutController);
-
-aboutController.$inject = ['$scope'];
-function aboutController($scope){
-  var viewModel = this;
-
-  viewModel.myVariable = "I'm pretty cool, I guess.";
-}
-
-angular
-  .module('PortfolioSPAModule')
-  .controller('adminController', adminController);
-
-adminController.$inject = ['$scope', '$location', '$http', 'AuthentictionService', 'UploadService'];
-function adminController($scope, $location, $http, AuthentictionService, UploadService){
-  var viewModel = this;
-
-  // Immediatelly check if a user is logged in, otherwise leave.
-  if(AuthentictionService.isLoggedIn() === false){
-    $location.path('/login');
-  }
-
-  viewModel.formMessageHeader = "";
-  viewModel.formError = "";
-  viewModel.created = false;
-  viewModel.newProject = {};
-  viewModel.fileData = {};
-
-  viewModel.createProject = function(){
-    var aspect = $('#projectCoverImage').width() / $('#projectCoverImage').height();
-    viewModel.newProject.projectCoverImageAspectRatio = aspect;
-
-    $http.post('/api/projects', viewModel.newProject, {
-      headers: {
-        Authorization: 'Bearer ' + AuthentictionService.getToken()
-      }
-    }).then(
-      function(response){
-        viewModel.formMessageHeader = "Success!";
-        viewModel.formError = "Project created.";
-        viewModel.created = true;
-      },
-      function(response){
-        viewModel.formMessageHeader = "Oops!";
-        viewModel.formError = "Something went wrong trying to create project. " + response.data.message;
-        viewModel.created = false;
-      }
-    );
-  };
-
-  viewModel.uploadProjectCoverImage = function(){
-    UploadService.uploadImage(viewModel.newProject.projectCoverImage,
-      function(response){
-        viewModel.newProject.projectCoverImage = response.filepath;
-      },
-      function(response){
-        console.log("something went wrong trying to upload file.");
-    });
-  };
-
-  viewModel.uploadBlogItemCoverImage = function(index){
-    UploadService.uploadImage(viewModel.newProject.pageItems[index].content,
-      function(response){
-        viewModel.newProject.pageItems[index].content = response.filepath;
-      },
-      function(response){
-        console.log("something went wrong trying to upload file.");
-    });
-  };
-
-  viewModel.uploadToGallery = function(index){
-    UploadService.uploadImage(viewModel.fileData,
-      function(response){
-        viewModel.newProject.pageItems[index].contentArray.push(response.filepath);
-      },
-      function(response){
-        console.log("something went wrong trying to upload file.");
-    });
-  };
-
-  viewModel.addNewPageItem = function(){
-    if(viewModel.newProject.pageItems === undefined){
-      viewModel.newProject.pageItems = [];
-    }
-
-    viewModel.newProject.pageItems.push({
-      position: 0,
-      content: "",
-      contentArray: []
-    });
-  };
-
-  viewModel.logout = function(){
-    AuthentictionService.logout();
-    $location.path('/');
-  };
-}
 
 // Using function scopes to prevent global scope variables.
 // God, I can't wait to use typescript.
@@ -251,6 +156,17 @@ function loginCtrl($location, AuthentictionService){
   }
 
 })();
+
+angular
+  .module('PortfolioSPAModule')
+  .controller('aboutController', aboutController);
+
+aboutController.$inject = ['$scope'];
+function aboutController($scope){
+  var viewModel = this;
+
+  viewModel.myVariable = "I'm pretty cool, I guess.";
+}
 
 (function(){
   angular
@@ -361,6 +277,10 @@ function loginCtrl($location, AuthentictionService){
         return;
       }
 
+      projects.sort(function(a, b) {
+        return a.position > b.position;
+      });
+
       var rowSize = ResponsiveService.GetHomePageRowSize();
       var projectRows = [];
       var rows = projects.length / rowSize;
@@ -399,6 +319,27 @@ function loginCtrl($location, AuthentictionService){
     service.allProjectsFilter = undefined;
     service.filmProjectsFilter = "film";
     service.artProjectsFilter = "art";
+
+    ///
+    /// Get all the projects raw data
+    ///
+    service.GetAllProjects = function(callback){
+      $http.get('/api/projects/').then(
+        function(response){
+          if(response.status === 200){
+
+            response.data.sort(function(a, b) {
+              return a.position > b.position;
+            });
+
+            callback(response.data);
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting all projects.");
+          // TODO: Redirect to 404 not found.
+      });
+    };
 
     ///
     /// Get a project page by its id.
@@ -529,6 +470,135 @@ function loginCtrl($location, AuthentictionService){
       };
 
     }
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .controller('newProjectController', newProjectController);
+
+  newProjectController.$inject = ['$scope', '$location', '$http', 'AuthentictionService', 'UploadService'];
+  function newProjectController($scope, $location, $http, AuthentictionService, UploadService){
+    var viewModel = this;
+
+    // Immediatelly check if a user is logged in, otherwise leave.
+    if(AuthentictionService.isLoggedIn() === false){
+      $location.path('/login');
+    }
+
+    viewModel.formMessageHeader = "";
+    viewModel.formError = "";
+    viewModel.created = false;
+    viewModel.newProject = {};
+    viewModel.fileData = {};
+
+    viewModel.createProject = function(){
+      var aspect = $('#projectCoverImage').width() / $('#projectCoverImage').height();
+      viewModel.newProject.projectCoverImageAspectRatio = aspect;
+
+      console.log(viewModel.newProject);
+
+      $http.post('/api/projects', viewModel.newProject, {
+        headers: {
+          Authorization: 'Bearer ' + AuthentictionService.getToken()
+        }
+      }).then(
+        function(response){
+          viewModel.formMessageHeader = "Success!";
+          viewModel.formError = "Project created.";
+          viewModel.created = true;
+          $location.path('/admin');
+        },
+        function(response){
+          viewModel.formMessageHeader = "Oops!";
+          viewModel.formError = "Something went wrong trying to create project. " + response.data.message;
+          viewModel.created = false;
+        }
+      );
+    };
+
+    viewModel.uploadProjectCoverImage = function(){
+      UploadService.uploadImage(viewModel.newProject.projectCoverImage,
+        function(response){
+          viewModel.newProject.projectCoverImage = response.filepath;
+        },
+        function(response){
+          console.log("something went wrong trying to upload file.");
+      });
+    };
+
+    viewModel.uploadBlogItemCoverImage = function(index){
+      UploadService.uploadImage(viewModel.newProject.pageItems[index].content,
+        function(response){
+          viewModel.newProject.pageItems[index].content = response.filepath;
+        },
+        function(response){
+          console.log("something went wrong trying to upload file.");
+      });
+    };
+
+    viewModel.uploadToGallery = function(index){
+      UploadService.uploadImage(viewModel.fileData,
+        function(response){
+          viewModel.newProject.pageItems[index].contentArray.push(response.filepath);
+        },
+        function(response){
+          console.log("something went wrong trying to upload file.");
+      });
+    };
+
+    viewModel.addNewPageItem = function(){
+      if(viewModel.newProject.pageItems === undefined){
+        viewModel.newProject.pageItems = [];
+      }
+
+      viewModel.newProject.pageItems.push({
+        position: 0,
+        content: "",
+        contentArray: []
+      });
+    };
+
+    viewModel.logout = function(){
+      AuthentictionService.logout();
+      $location.path('/');
+    };
+  }
+
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .controller('dashboardController', dashboardController);
+
+  dashboardController.$inject = ['$scope', '$location', '$http', 'ProjectsService', 'AuthentictionService'];
+  function dashboardController($scope, $location, $http, ProjectsService, AuthentictionService){
+
+    // Immediatelly check if a user is logged in, otherwise leave.
+    if(AuthentictionService.isLoggedIn() === false){
+      $location.path('/login');
+    }
+
+    var viewModel = this;
+
+    viewModel.projects = [];
+
+    ///
+    /// Request the projects to disply on the home page.
+    ///
+    ProjectsService.GetAllProjects(function(projects){
+      viewModel.projects = projects;
+    });
+
+    viewModel.logout = function(){
+      AuthentictionService.logout();
+      $location.path('/');
+    };
+  }
+
 })();
 
 (function(){

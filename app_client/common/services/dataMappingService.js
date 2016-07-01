@@ -49,6 +49,10 @@
         return;
       }
 
+      projects.sort(function(a, b) {
+        return a.position > b.position;
+      });
+
       var rowSize = ResponsiveService.GetHomePageRowSize();
       var projectRows = [];
       var rows = projects.length / rowSize;
