@@ -59,6 +59,15 @@ module.exports.editProject = function(req, res){
 };
 
 module.exports.deleteProject = function(req, res){
-  res.status(200);
-  res.json({"text": "delete project"});
+
+  Project.remove({_id: req.params.projectsid }, function(err){
+    if(err){
+      res.status(500);
+      res.json({"message": "Something went wrong trying to delete project: " + err.message});
+      return;
+    }
+
+    res.status(200);
+    res.json({"message": "Project deleted"});
+  });
 };

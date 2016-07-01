@@ -85,11 +85,6 @@
         contentArray: []
       });
     };
-
-    viewModel.logout = function(){
-      AuthentictionService.logout();
-      $location.path('/');
-    };
   }
 
 })();

@@ -1,9 +1,4 @@
-<h1 style="display: inline-block;">New Project</h1>
-<form ng-submit="viewModel.logout()" style="float:right; display:inline-block;">
-  <button type="submit" class="btn btn-default">Logout</button></button>
-</form>
-
-<div style="border: 1px solid silver; width: 100%; margin-bottom: 50px;"></div>
+<admin-header title="New Project"></admin-header>
 
   <div class="admin-page-container">
     <div ng-show="viewModel.formError != ''" class="alert" ng-class="{ 'alert-success': viewModel.created === true, 'alert-danger': viewModel.created === false}">
