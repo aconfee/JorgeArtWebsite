@@ -12,35 +12,19 @@
     /// Map the data returned by a project page to its view model.
     ///
      service.MapProjectDataToProjectPageVm = function(data){
-      var blogItems = [];
-
-      var i = 0;
-      for(i = 0; i < data.videos.length; i++){
-        // Trust the link provided and add.
-        data.videos[i].source = $sce.trustAsResourceUrl(data.videos[i].source);
-        blogItems.push(data.videos[i]);
-      }
-
-      for(i = 0; i < data.textBlocks.length; i++){
-        blogItems.push(data.textBlocks[i]);
-      }
-
-      for(i = 0; i < data.coverImages.length; i++){
-        blogItems.push(data.coverImages[i]);
-      }
-
-      for(i = 0; i < data.galleries.length; i++){
-        blogItems.push(data.galleries[i]);
-      }
-
-      for(i = 0; i < data.pageBreaks.length; i++){
-        blogItems.push(data.pageBreaks[i]);
-      }
+      var blogItems = data.pageItems;
 
       // Sort the list by position
       blogItems.sort(function(a, b) {
         return a.position > b.position;
       });
+
+      // Trust all video links as secure.
+      for(var i = 0; i < data.pageItems.length; i++){
+        if(data.pageItems[i].type === "video"){
+          data.pageItems[i].content = $sce.trustAsResourceUrl(data.pageItems[i].content);
+        }
+      }
 
       return blogItems;
     };

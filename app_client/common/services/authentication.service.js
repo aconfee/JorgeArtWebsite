@@ -1,10 +1,10 @@
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .service('authentication', authentication);
+    .service('AuthentictionService', AuthentictionService);
 
-    authentication.$inject = ['$window', '$http'];
-    function authentication($window, $http){
+    AuthentictionService.$inject = ['$window', '$http'];
+    function AuthentictionService($window, $http){
       var saveToken = function(token){
         $window.localStorage['admin-token'] = token;
       };

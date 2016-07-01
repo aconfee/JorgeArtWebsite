@@ -44,7 +44,7 @@
       $http.get('/api/projects/').then(
         function(response){
           if(response.status === 200){
-            var filteredProjectsList = FilterProjectsByCategory(response.data.projects, category);
+            var filteredProjectsList = FilterProjectsByCategory(response.data, category);
             var mapped =  DataMappingService.MapProjectsDataToHomePageVm(filteredProjectsList);
 
             callback(mapped);

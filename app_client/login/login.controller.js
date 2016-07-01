@@ -2,8 +2,8 @@ angular
   .module('PortfolioSPAModule')
   .controller('loginCtrl', loginCtrl);
 
-loginCtrl.$inject = ['$location', 'authentication'];
-function loginCtrl($location, authentication){
+loginCtrl.$inject = ['$location', 'AuthentictionService'];
+function loginCtrl($location, AuthentictionService){
   var viewModel = this;
 
   viewModel.pageHeader = {
@@ -29,7 +29,7 @@ function loginCtrl($location, authentication){
 
   viewModel.doLogin = function(){
     viewModel.formError = "";
-    authentication
+    AuthentictionService
       .login(viewModel.credentials)
       .error(function(err){
         viewModel.formError = err.message;

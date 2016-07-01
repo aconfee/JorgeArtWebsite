@@ -63,34 +63,87 @@ angular
   .module('PortfolioSPAModule')
   .controller('adminController', adminController);
 
-adminController.$inject = ['$location', '$http', 'authentication'];
-function adminController($location, $http, authentication){
+adminController.$inject = ['$scope', '$location', '$http', 'AuthentictionService', 'UploadService'];
+function adminController($scope, $location, $http, AuthentictionService, UploadService){
   var viewModel = this;
 
   // Immediatelly check if a user is logged in, otherwise leave.
-  if(authentication.isLoggedIn() === false){
-    $location.path('/');
+  if(AuthentictionService.isLoggedIn() === false){
+    $location.path('/login');
   }
 
+  viewModel.formMessageHeader = "";
   viewModel.formError = "";
+  viewModel.created = false;
+  viewModel.newProject = {};
+  viewModel.fileData = {};
 
   viewModel.createProject = function(){
-    $http.post('/api/projects', {lol: "data"}, {
+    var aspect = $('#projectCoverImage').width() / $('#projectCoverImage').height();
+    viewModel.newProject.projectCoverImageAspectRatio = aspect;
+
+    $http.post('/api/projects', viewModel.newProject, {
       headers: {
-        Authorization: 'Bearer ' + authentication.getToken()
+        Authorization: 'Bearer ' + AuthentictionService.getToken()
       }
     }).then(
       function(response){
-        viewModel.formError = "Project created!";
+        viewModel.formMessageHeader = "Success!";
+        viewModel.formError = "Project created.";
+        viewModel.created = true;
       },
       function(response){
+        viewModel.formMessageHeader = "Oops!";
         viewModel.formError = "Something went wrong trying to create project. " + response.data.message;
+        viewModel.created = false;
       }
     );
   };
 
+  viewModel.uploadProjectCoverImage = function(){
+    UploadService.uploadImage(viewModel.newProject.projectCoverImage,
+      function(response){
+        viewModel.newProject.projectCoverImage = response.filepath;
+      },
+      function(response){
+        console.log("something went wrong trying to upload file.");
+    });
+  };
+
+  viewModel.uploadBlogItemCoverImage = function(index){
+    UploadService.uploadImage(viewModel.newProject.pageItems[index].content,
+      function(response){
+        viewModel.newProject.pageItems[index].content = response.filepath;
+      },
+      function(response){
+        console.log("something went wrong trying to upload file.");
+    });
+  };
+
+  viewModel.uploadToGallery = function(index){
+    UploadService.uploadImage(viewModel.fileData,
+      function(response){
+        viewModel.newProject.pageItems[index].contentArray.push(response.filepath);
+      },
+      function(response){
+        console.log("something went wrong trying to upload file.");
+    });
+  };
+
+  viewModel.addNewPageItem = function(){
+    if(viewModel.newProject.pageItems === undefined){
+      viewModel.newProject.pageItems = [];
+    }
+
+    viewModel.newProject.pageItems.push({
+      position: 0,
+      content: "",
+      contentArray: []
+    });
+  };
+
   viewModel.logout = function(){
-    authentication.logout();
+    AuthentictionService.logout();
     $location.path('/');
   };
 }
@@ -138,8 +191,8 @@ angular
   .module('PortfolioSPAModule')
   .controller('loginCtrl', loginCtrl);
 
-loginCtrl.$inject = ['$location', 'authentication'];
-function loginCtrl($location, authentication){
+loginCtrl.$inject = ['$location', 'AuthentictionService'];
+function loginCtrl($location, AuthentictionService){
   var viewModel = this;
 
   viewModel.pageHeader = {
@@ -165,7 +218,7 @@ function loginCtrl($location, authentication){
 
   viewModel.doLogin = function(){
     viewModel.formError = "";
-    authentication
+    AuthentictionService
       .login(viewModel.credentials)
       .error(function(err){
         viewModel.formError = err.message;
@@ -202,10 +255,10 @@ function loginCtrl($location, authentication){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .service('authentication', authentication);
+    .service('AuthentictionService', AuthentictionService);
 
-    authentication.$inject = ['$window', '$http'];
-    function authentication($window, $http){
+    AuthentictionService.$inject = ['$window', '$http'];
+    function AuthentictionService($window, $http){
       var saveToken = function(token){
         $window.localStorage['admin-token'] = token;
       };
@@ -271,35 +324,19 @@ function loginCtrl($location, authentication){
     /// Map the data returned by a project page to its view model.
     ///
      service.MapProjectDataToProjectPageVm = function(data){
-      var blogItems = [];
-
-      var i = 0;
-      for(i = 0; i < data.videos.length; i++){
-        // Trust the link provided and add.
-        data.videos[i].source = $sce.trustAsResourceUrl(data.videos[i].source);
-        blogItems.push(data.videos[i]);
-      }
-
-      for(i = 0; i < data.textBlocks.length; i++){
-        blogItems.push(data.textBlocks[i]);
-      }
-
-      for(i = 0; i < data.coverImages.length; i++){
-        blogItems.push(data.coverImages[i]);
-      }
-
-      for(i = 0; i < data.galleries.length; i++){
-        blogItems.push(data.galleries[i]);
-      }
-
-      for(i = 0; i < data.pageBreaks.length; i++){
-        blogItems.push(data.pageBreaks[i]);
-      }
+      var blogItems = data.pageItems;
 
       // Sort the list by position
       blogItems.sort(function(a, b) {
         return a.position > b.position;
       });
+
+      // Trust all video links as secure.
+      for(var i = 0; i < data.pageItems.length; i++){
+        if(data.pageItems[i].type === "video"){
+          data.pageItems[i].content = $sce.trustAsResourceUrl(data.pageItems[i].content);
+        }
+      }
 
       return blogItems;
     };
@@ -395,7 +432,7 @@ function loginCtrl($location, authentication){
       $http.get('/api/projects/').then(
         function(response){
           if(response.status === 200){
-            var filteredProjectsList = FilterProjectsByCategory(response.data.projects, category);
+            var filteredProjectsList = FilterProjectsByCategory(response.data, category);
             var mapped =  DataMappingService.MapProjectsDataToHomePageVm(filteredProjectsList);
 
             callback(mapped);
@@ -466,6 +503,37 @@ function loginCtrl($location, authentication){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .service('UploadService', UploadService);
+
+    UploadService.$inject = ['$http', 'AuthentictionService'];
+    function UploadService($http, AuthentictionService){
+      service = this;
+
+      service.uploadImage = function(fileData, successCB, errorCB){
+
+        var fd = new FormData();
+        fd.append('file', fileData);
+        $http.post("/api/upload", fd, {
+            transformRequest: angular.identity,
+            headers: {
+              'Content-Type': undefined,
+              Authorization: 'Bearer ' + AuthentictionService.getToken()
+            }
+        })
+        .success(function(response){
+          successCB(response);
+        })
+        .error(function(response){
+          errorCB(response);
+        });
+      };
+
+    }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('coverImage', coverImage);
 
   function coverImage(){
@@ -491,6 +559,28 @@ function loginCtrl($location, authentication){
         embededUrl: '=embededUrl'
       },
       templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('fileModel', ['$parse', fileModel]);
+
+  function fileModel($parse){
+    return{
+      restrict:'A',
+      link: function(scope, element, attrs){
+        var model = $parse(attrs.fileModel);
+        var modelSetter = model.assign;
+
+        element.bind('change', function(){
+          scope.$apply(function(){
+            modelSetter(scope, element[0].files[0]);
+          });
+        });
+      }
     };
   }
 })();
@@ -584,6 +674,22 @@ function loginCtrl($location, authentication){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('imageLightbox', imageLightbox);
+
+  function imageLightbox(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('navigationBar', navigationBar);
 
   function navigationBar(){
@@ -619,22 +725,6 @@ function loginCtrl($location, authentication){
         content: '=content'
       },
       templateUrl: '/common/directives/textBlock/textBlock.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
-
-  function imageLightbox(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html'
     };
   }
 })();

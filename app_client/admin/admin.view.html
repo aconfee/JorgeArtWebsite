@@ -1,13 +1,114 @@
-<h1>Admin Page</h1>
+<h1 style="display: inline-block;">New Project</h1>
+<form ng-submit="viewModel.logout()" style="float:right; display:inline-block;">
+  <button type="submit" class="btn btn-default">Logout</button></button>
+</form>
 
-<div class="col-md-6 col-sm-8">
-  <form ng-submit="viewModel.createProject()">
-    <div role="alert" ng-show="viewModel.formError" class="alert alert-danger">
-      {{ viewModel.formError }}
+<div style="border: 1px solid silver; width: 100%; margin-bottom: 50px;"></div>
+
+  <div class="admin-page-container">
+    <div ng-show="viewModel.formError != ''" class="alert" ng-class="{ 'alert-success': viewModel.created === true, 'alert-danger': viewModel.created === false}">
+      <strong>{{ viewModel.formMessageHeader }}</strong> {{ viewModel.formError }}
     </div>
-    <button type="submit" class="btn btn-default">Create Project</button></button>
-  </form>
-  <form ng-submit="viewModel.logout()">
-    <button type="submit" class="btn btn-default">Logout</button></button>
-  </form>
-</div>
+    <form>
+      <!-- PROJECT POSITION -->
+      <div>
+        <span class="admin-input-row-contianer input-tiny">
+          <label>Pos.</label>
+          <input type="number" ng-model="viewModel.newProject.position" class="form-control" placeholder="0">
+        </span>
+        <!-- PROJECT NAME -->
+        <span class="admin-input-row-contianer input-large">
+          <label>Name</label>
+          <input type="text" ng-model="viewModel.newProject.name" class="form-control" placeholder="Name">
+        </span>
+      </div>
+      <!-- PROJECT CATEGORY -->
+      <div class="admin-input-row-contianer input-fill-space">
+        <label>Category</label>
+        <select ng-model="viewModel.newProject.category" class="form-control">
+          <option value="art">Art</option>
+          <option value="film">Film</option>
+        </select>
+      </div>
+      <!-- COVER IMAGE -->
+      <div class="admin-input-row-contianer">
+        <p>Cover image</p>
+        <div class="image-upload-box">
+          <img id="projectCoverImage" src="{{ viewModel.newProject.projectCoverImage }}" class="upload-preview-image-single"/>
+        </div>
+        <form  enctype="multipart/form-data" style="display: inline-block;">
+          <input type="file" file-model="viewModel.newProject.projectCoverImage" class="file" name="projectCoverImage" style="margin: 10px 10px;">
+          <button type="button" class="btn btn-primary" ng-click="viewModel.uploadProjectCoverImage()" style="margin: 10px 10px;">Upload</button>
+        </form>
+      </div>
+
+      <h3 style="margin-top: 40px; margin-left: 10px; margin-right:10px;">Page Pieces</h3>
+      <div style="border: 1px solid silver; width: 100%; margin-bottom: 30px;"></div>
+
+      <!-- Page Items -->
+      <div ng-repeat="pageItem in viewModel.newProject.pageItems">
+        <!-- General -->
+        <span class="admin-input-row-contianer input-tiny">
+          <label>Pos.</label>
+          <input type="number" = ng-model="pageItem.position" class="form-control" placeholder="0" />
+        </span>
+        <span class="admin-input-row-contianer input-large">
+          <label>Type</label>
+          <select ng-model="pageItem.type" class="form-control">
+            <option value="video">Video</option>
+            <option value="text">Text</option>
+            <option value="pageBreak">Page Break</option>
+            <option value="coverImage">Cover Image</option>
+            <option value="gallery">Gallery</option>
+          </select>
+        </span>
+        <!-- VIDEO -->
+        <div style="margin: 10px 10px;" class="form-group" ng-if="pageItem.type == 'video'">
+          <label>Embeded Link:</label>
+          <input style="width:462px; display: inline-block;" type="text" ng-model="pageItem.content" class="form-control"/>
+        </div>
+        <!-- TEXT -->
+        <div ng-if="pageItem.type == 'text'">
+          <textarea ng-model="pageItem.content" style="margin: 10px 10px; width:580px;" class="form-control" rows="5" placeholder="Your text..."></textarea>
+        </div>
+        <!-- COVER IMAGE -->
+        <div ng-if="pageItem.type == 'coverImage'" style="margin: 5px 10px;">
+          <div class="image-upload-box">
+            <img src="{{ pageItem.content }}" class="upload-preview-image-single"/>
+          </div>
+          <form  enctype="multipart/form-data" style="display: inline-block;">
+            <input type="file" file-model="pageItem.content" class="file" name="coverImage" style="margin: 10px 10px;">
+            <button class="btn btn-primary" ng-click="viewModel.uploadBlogItemCoverImage($index)" style="margin: 10px 10px;">Upload</button>
+          </form>
+        </div>
+        <!-- GALLERY -->
+        <div ng-if="pageItem.type == 'gallery'" style="margin: 5px 10px;">
+          <div class="image-upload-box" style="overflow-x:scroll;">
+            <div style="min-width:5000px; min-height: 200px; max-height: 200px; overflow: none;">
+              <img ng-repeat="image in pageItem.contentArray" src="{{ image }}" class="upload-preview-image-multi"/>
+            </div>
+          </div>
+          <form  enctype="multipart/form-data" style="display: inline-block;">
+            <input type="file" file-model="viewModel.fileData" class="file" name="coverImage" style="margin: 10px 10px;">
+            <button class="btn btn-primary" ng-click="viewModel.uploadToGallery($index)" style="margin: 10px 10px;">Upload</button>
+          </form>
+        </div>
+        <div style="border: 1px solid silver; width: 80%; margin: 30px auto;"></div>
+      </div>
+
+      <!-- Add Item Button -->
+      <button type="button" class="btn btn-primary" ng-click="viewModel.addNewPageItem()" style="margin-top:20px; float:right;">Add Item</button>
+
+      <p style="height:100px;"></p>
+
+      <!-- CREATE PROJECT -->
+      <div style="border: 1px solid silver; width: 100%; margin-bottom: 30px;"></div>
+      <div ng-show="viewModel.formError != ''" class="alert" ng-class="{ 'alert-success': viewModel.created === true, 'alert-danger': viewModel.created === false}">
+        <strong>{{ viewModel.formMessageHeader }}</strong> {{ viewModel.formError }}
+      </div>
+      <button class="btn btn-primary" style="float:right;" ng-click="viewModel.createProject()">Create Project!</button>
+    </form>
+
+    <p style="height:100px;"></p>
+
+  </div>

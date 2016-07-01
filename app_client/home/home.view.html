@@ -5,7 +5,7 @@
   <underline-page-break ng-show="viewModel.showVideo"></underline-page-break>
   <div class="flex-group-container" ng-repeat="row in viewModel.projects">
     <div class="flex-item-container" style="flex:{{ project.projectCoverImageAspectRatio }}" ng-repeat="project in row">
-      <a href="/projects/{{ project.id }}">
+      <a href="/projects/{{ project._id }}">
         <img src="{{ project.projectCoverImage }}"></img>
         <div class="project-cover-image">
           <div class="project-cover-text">{{ project.name }}</div>
