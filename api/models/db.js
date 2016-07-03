@@ -3,6 +3,12 @@ require('./projects'); // This file is included in app, so include our models he
 require('./users');
 
 var dbURI = 'mongodb://localhost/jorgePortfolio';
+if(process.env.NODE_ENV === 'production'){
+  dbURI = process.env.MONGOLAB_URI;
+}
+
+console.log('DB URIIIIIIII!!!! ' + dbURI);
+
 mongoose.connect(dbURI);
 
 mongoose.connection.on('connected', function(){
