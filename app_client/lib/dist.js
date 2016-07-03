@@ -339,11 +339,12 @@ function loginCtrl($location, AuthentictionService){
           // Break if no projects remaining.
           if(projectsIndex === projects.length) break;
 
-          if(rowSize === 1){
-            projects[projectsIndex].projectCoverImageAspectRatio = 1;
-          }
-
           projectRows[y].push(projects[ projectsIndex ]);
+        }
+
+        // If only one item in row, full size.
+        if(projectRows[y].length === 1){
+          projectRows[y][0].projectCoverImageAspectRatio = 1;
         }
       }
 
@@ -730,6 +731,22 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('coverImage', coverImage);
+
+  function coverImage(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('adminHeader', adminHeader);
 
   function adminHeader(){
@@ -757,38 +774,6 @@ function loginCtrl($location, AuthentictionService){
     };
   }
 
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('coverImage', coverImage);
-
-  function coverImage(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
-
-  function embededVideo(){
-    return{
-      restrict:'EA',
-      scope:{
-        embededUrl: '=embededUrl'
-      },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
-    };
-  }
 })();
 
 (function(){
@@ -945,7 +930,40 @@ function loginCtrl($location, AuthentictionService){
   function navigationBar(){
     return{
       restrict:'EA',
-      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html'
+      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
+      controller: navigationBarController,
+      controllerAs: 'ctrl'
+    };
+  }
+
+  navigationBarController.$inject = ['$location'];
+  function navigationBarController($location){
+    var ctrl = this;
+
+    ctrl.isActive = function(path){
+      if(path.length === 1){
+        // If checking if we're on homepage...
+        return $location.path() === '/' && $location.search().category === undefined;
+      }
+
+      return $location.absUrl().indexOf(path) != -1;
+    };
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('embededVideo', embededVideo);
+
+  function embededVideo(){
+    return{
+      restrict:'EA',
+      scope:{
+        embededUrl: '=embededUrl'
+      },
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
     };
   }
 })();
