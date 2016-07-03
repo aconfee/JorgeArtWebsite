@@ -26,6 +26,7 @@
 
     ///
     /// Initialize variables if we're editing
+    ///
     if(viewModel.isNew === false){
       var projectid = $routeParams.projectid;
       ProjectsService.GetProject(projectid, function(project){
@@ -33,6 +34,9 @@
       });
     }
 
+    ///
+    /// Add the project to our db.
+    ///
     viewModel.createProject = function(){
 
       viewModel.newProject.projectCoverImageAspectRatio = getAspectRatio("#projectCoverImage");
@@ -133,7 +137,7 @@
       var screenImage = $("#projectCoverImage");
       var theImage = new Image();
       theImage.src = screenImage.attr("src");
-      
+
       var aspect = theImage.width / theImage.height;
 
       return aspect;
