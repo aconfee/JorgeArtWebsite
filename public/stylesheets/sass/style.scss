@@ -80,3 +80,14 @@ a{
 	@extend .page-container;
 	max-width:1600px;
 }
+
+.single-row-image{
+	flex:1;
+}
+
+.glyphicon{
+	&:hover{
+		color:blue;
+		cursor: pointer;
+	}
+}

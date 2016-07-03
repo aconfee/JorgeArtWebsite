@@ -1,4 +1,5 @@
-<admin-header title="New Project"></admin-header>
+<admin-header ng-if="viewModel.isNew" title="New Project"></admin-header>
+<admin-header ng-if="viewModel.isNew == false" title="Edit Project"></admin-header>
 
   <div class="admin-page-container">
     <div ng-show="viewModel.formError != ''" class="alert" ng-class="{ 'alert-success': viewModel.created === true, 'alert-danger': viewModel.created === false}">
@@ -21,8 +22,11 @@
       <div class="admin-input-row-contianer input-fill-space">
         <label>Category</label>
         <select ng-model="viewModel.newProject.category" class="form-control">
-          <option value="art">Art</option>
-          <option value="film">Film</option>
+          <option value="design">Design</option>
+          <option value="animation">Animation</option>
+          <option value="illustration">Illustration</option>
+          <option value="artwork">Artwork</option>
+          <option value="misc">Misc.</option>
         </select>
       </div>
       <!-- COVER IMAGE -->
@@ -47,7 +51,7 @@
           <label>Pos.</label>
           <input type="number" = ng-model="pageItem.position" class="form-control" placeholder="0" />
         </span>
-        <span class="admin-input-row-contianer input-large">
+        <span class="admin-input-row-contianer input-medium">
           <label>Type</label>
           <select ng-model="pageItem.type" class="form-control">
             <option value="video">Video</option>
@@ -57,6 +61,7 @@
             <option value="gallery">Gallery</option>
           </select>
         </span>
+        <button class="btn btn-default" ng-click="viewModel.removePageItem($index)">Remove</button>
         <!-- VIDEO -->
         <div style="margin: 10px 10px;" class="form-group" ng-if="pageItem.type == 'video'">
           <label>Embeded Link:</label>
@@ -101,7 +106,9 @@
       <div ng-show="viewModel.formError != ''" class="alert" ng-class="{ 'alert-success': viewModel.created === true, 'alert-danger': viewModel.created === false}">
         <strong>{{ viewModel.formMessageHeader }}</strong> {{ viewModel.formError }}
       </div>
-      <button class="btn btn-primary" style="float:right;" ng-click="viewModel.createProject()">Create Project!</button>
+      <button ng-if="viewModel.isNew" class="btn btn-primary" style="float:right; margin:0 5px;" ng-click="viewModel.createProject()">Create Project!</button>
+      <button ng-if="viewModel.isNew === false" class="btn btn-primary" style="float:right; margin:0 5px;" ng-click="viewModel.editProject()">Save</button>
+      <button class="btn btn-default" style="float:right; margin:0 5px;" ng-click="viewModel.resetProject()">Reset All</button>
     </form>
 
     <p style="height:100px;"></p>

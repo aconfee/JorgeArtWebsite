@@ -4,13 +4,18 @@
     .module('PortfolioSPAModule')
     .controller('newProjectController', newProjectController);
 
-  newProjectController.$inject = ['$scope', '$location', '$http', 'AuthentictionService', 'UploadService'];
-  function newProjectController($scope, $location, $http, AuthentictionService, UploadService){
+  newProjectController.$inject = ['$scope', '$location', '$http', '$routeParams', 'AuthentictionService', 'UploadService' ,'ProjectsService'];
+  function newProjectController($scope, $location, $http, $routeParams, AuthentictionService, UploadService, ProjectsService){
     var viewModel = this;
 
     // Immediatelly check if a user is logged in, otherwise leave.
     if(AuthentictionService.isLoggedIn() === false){
       $location.path('/login');
+    }
+
+    viewModel.isNew = false;
+    if($location.absUrl().indexOf('newProject') > -1){
+      viewModel.isNew = true;
     }
 
     viewModel.formMessageHeader = "";
@@ -19,11 +24,18 @@
     viewModel.newProject = {};
     viewModel.fileData = {};
 
-    viewModel.createProject = function(){
-      var aspect = $('#projectCoverImage').width() / $('#projectCoverImage').height();
-      viewModel.newProject.projectCoverImageAspectRatio = aspect;
+    ///
+    /// Initialize variables if we're editing
+    if(viewModel.isNew === false){
+      var projectid = $routeParams.projectid;
+      ProjectsService.GetProject(projectid, function(project){
+        viewModel.newProject = project;
+      });
+    }
 
-      console.log(viewModel.newProject);
+    viewModel.createProject = function(){
+
+      viewModel.newProject.projectCoverImageAspectRatio = getAspectRatio("#projectCoverImage");
 
       $http.post('/api/projects', viewModel.newProject, {
         headers: {
@@ -38,10 +50,33 @@
         },
         function(response){
           viewModel.formMessageHeader = "Oops!";
-          viewModel.formError = "Something went wrong trying to create project. " + response.data.message;
+          viewModel.formError = "Something went wrong trying to create project. " + response.data;
           viewModel.created = false;
         }
       );
+    };
+
+    viewModel.editProject = function(){
+      var projectid = $routeParams.projectid;
+
+      viewModel.newProject.projectCoverImageAspectRatio = getAspectRatio('#projectCoverImage');
+
+      $http.put('/api/projects/' + projectid, viewModel.newProject, {
+        headers: {
+          Authorization: 'Bearer ' + AuthentictionService.getToken()
+        }
+      }).then(
+        function(response){
+          viewModel.formMessageHeader = "Success!";
+          viewModel.formError = "Project updated.";
+          viewModel.created = true;
+          $location.path('/admin');
+        },
+        function(response){
+          viewModel.formMessageHeader = "Oops!";
+          viewModel.formError = "Something went wrong trying to save this project. " + response.data;
+          viewModel.created = false;
+      });
     };
 
     viewModel.uploadProjectCoverImage = function(){
@@ -84,6 +119,24 @@
         content: "",
         contentArray: []
       });
+    };
+
+    viewModel.removePageItem = function(index){
+      viewModel.newProject.pageItems.splice(index, 1);
+    };
+
+    viewModel.resetProject = function(){
+      viewModel.newProject = {};
+    };
+
+    var getAspectRatio = function(elementQuery){
+      var screenImage = $("#projectCoverImage");
+      var theImage = new Image();
+      theImage.src = screenImage.attr("src");
+      
+      var aspect = theImage.width / theImage.height;
+
+      return aspect;
     };
   }
 

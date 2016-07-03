@@ -67,6 +67,10 @@
           // Break if no projects remaining.
           if(projectsIndex === projects.length) break;
 
+          if(rowSize === 1){
+            projects[projectsIndex].projectCoverImageAspectRatio = 1;
+          }
+
           projectRows[y].push(projects[ projectsIndex ]);
         }
       }

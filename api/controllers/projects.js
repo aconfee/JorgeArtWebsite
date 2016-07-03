@@ -54,8 +54,34 @@ module.exports.getProject = function(req, res){
 };
 
 module.exports.editProject = function(req, res){
-  res.status(200);
-  res.json({"text": "edit project"});
+
+  Project.findOne({ _id: req.params.projectsid }, function (err, doc){
+
+    if(err){
+      console.log(err);
+      res.status(500);
+      res.json(err);
+      return;
+    }
+
+    doc.name = req.body.name;
+    doc.category = req.body.category;
+    doc.projectCoverImage = req.body.projectCoverImage;
+    doc.projectCoverImageAspectRatio = req.body.projectCoverImageAspectRatio;
+    doc.pageItems = req.body.pageItems;
+
+    doc.save(function(err, doc){
+      if(err){
+        console.log(err);
+        res.status(500);
+        res.json(err);
+        return;
+      }
+
+      res.status(200);
+      res.json({"message": "Updated " + req.body.name});
+    });
+  });
 };
 
 module.exports.deleteProject = function(req, res){

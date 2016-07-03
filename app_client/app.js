@@ -35,6 +35,11 @@
         controller: 'dashboardController',
         controllerAs: 'viewModel'
       })
+      .when('/admin/edit/:projectid', {
+        templateUrl: '/admin/newProject/newProject.view.html',
+        controller: 'newProjectController',
+        controllerAs: 'viewModel'
+      })
       .when('/admin/newProject', {
         templateUrl: '/admin/newProject/newProject.view.html',
         controller: 'newProjectController',

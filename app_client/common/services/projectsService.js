@@ -9,8 +9,11 @@
     var service = this;
 
     service.allProjectsFilter = undefined;
-    service.filmProjectsFilter = "film";
-    service.artProjectsFilter = "art";
+    service.designProjectsFilter = "design";
+    service.animationProjectsFilter = "animation";
+    service.illustrationProjectsFilter = "illustration";
+    service.artworkProjectsFilter = "artwork";
+    service.miscProjectsFilter = "misc";
 
     ///
     /// Get all the projects raw data
@@ -29,6 +32,23 @@
         },
         function(response){
           console.error("Something went wrong getting all projects.");
+          // TODO: Redirect to 404 not found.
+      });
+    };
+
+    ///
+    /// Get a project by its id.
+    ///
+    service.GetProject = function(projectId, callback){
+
+      $http.get('/api/projects/' + projectId).then(
+        function(response){
+          if(response.status === 200){
+            callback(response.data);
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting project page " + projectId);
           // TODO: Redirect to 404 not found.
       });
     };
@@ -54,13 +74,6 @@
     /// Get all projects as they are needed on the home page.
     ///
     service.GetProjectsHomePage = function(category, callback){
-
-      if(category !== service.allProjectsFilter &&
-        category !== service.filmProjectsFilter &&
-        category !== service.artProjectsFilter){
-          console.error("Invalid category provided: " + category);
-          return;
-      }
 
       $http.get('/api/projects/').then(
         function(response){

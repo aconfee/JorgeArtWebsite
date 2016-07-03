@@ -59,6 +59,13 @@ a {
 .project-page-container {
   max-width: 1600px; }
 
+.single-row-image {
+  flex: 1; }
+
+.glyphicon:hover {
+  color: blue;
+  cursor: pointer; }
+
 .admin-page-container {
   max-width: 600px;
   overflow-x: none;
@@ -70,6 +77,9 @@ a {
 
 .input-tiny {
   width: 50px; }
+
+.input-medium {
+  width: 415px; }
 
 .input-large {
   width: 505px; }
@@ -99,17 +109,6 @@ a {
   max-width: 200px;
   display: inline-block; }
 
-.cover-image-container {
-  display: flex;
-  width: 100%;
-  padding: 5px; }
-
-.cover-image {
-  flex: 1; }
-  .cover-image img {
-    width: 100%;
-    height: auto; }
-
 .video-container {
   position: relative;
   padding-bottom: 56.25%;
@@ -125,6 +124,17 @@ a {
   left: 0;
   width: 100%;
   height: 100%; }
+
+.cover-image-container {
+  display: flex;
+  width: 100%;
+  padding: 5px; }
+
+.cover-image {
+  flex: 1; }
+  .cover-image img {
+    width: 100%;
+    height: auto; }
 
 .gallery-thumb-container {
   display: flex;
