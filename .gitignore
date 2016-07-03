@@ -6,3 +6,4 @@ node_modules
 
 # Uploaded images
 public/images/*
+!public/images/dummy.jpg
