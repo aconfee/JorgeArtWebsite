@@ -65,6 +65,7 @@ module.exports.editProject = function(req, res){
     }
 
     doc.name = req.body.name;
+    doc.position = req.body.position;
     doc.category = req.body.category;
     doc.projectCoverImage = req.body.projectCoverImage;
     doc.projectCoverImageAspectRatio = req.body.projectCoverImageAspectRatio;
