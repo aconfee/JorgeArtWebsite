@@ -69,45 +69,6 @@ function aboutController($scope){
   viewModel.myVariable = "I'm pretty cool, I guess.";
 }
 
-// Using function scopes to prevent global scope variables.
-// God, I can't wait to use typescript.
-(function(){
-
-  angular
-    .module('PortfolioSPAModule')
-    .controller('homeController', homeController);
-
-  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsService'];
-  function homeController($scope, $window, $location, $sce, ProjectsService){
-    var viewModel = this;
-    var categoryFilter = $location.search().category; // Once per 'page load'
-
-    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
-    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
-
-    ///
-    /// Request the projects to disply on the home page.
-    ///
-    ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
-      viewModel.projects = projectsVm;
-    });
-
-    ///
-    /// Re-get the projects if page is resized (getting projects will rebuild the rows
-    /// according to screen size).
-    /// TODO: Only get projects when resizing is done so we're not making a million calls.
-    ///
-    angular.element($window).bind('resize', function () {
-      // Possiblity to cache here... if necessary.
-      ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
-        viewModel.projects = projectsVm;
-        //$scope.$apply(); // Not needed... two way bind automatically digests.
-      });
-    });
-  }
-
-})();
-
 angular
   .module('PortfolioSPAModule')
   .controller('loginCtrl', loginCtrl);
@@ -210,6 +171,374 @@ function loginCtrl($location, AuthentictionService){
     };
   }
 
+})();
+
+// Using function scopes to prevent global scope variables.
+// God, I can't wait to use typescript.
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .controller('homeController', homeController);
+
+  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsService'];
+  function homeController($scope, $window, $location, $sce, ProjectsService){
+    var viewModel = this;
+    var categoryFilter = $location.search().category; // Once per 'page load'
+
+    console.log("entering home page controller");
+
+    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
+
+    ///
+    /// Request the projects to disply on the home page.
+    ///
+    ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+      viewModel.projects = projectsVm;
+    });
+
+    ///
+    /// Re-get the projects if page is resized (getting projects will rebuild the rows
+    /// according to screen size).
+    /// TODO: Only get projects when resizing is done so we're not making a million calls.
+    ///
+    /*
+    angular.element($window).bind('resize', function () {
+      // Possiblity to cache here... if necessary.
+      ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+        viewModel.projects = projectsVm;
+        //$scope.$apply(); // Not needed... two way bind automatically digests.
+      });
+    });
+    */
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .service('AuthentictionService', AuthentictionService);
+
+    AuthentictionService.$inject = ['$window', '$http'];
+    function AuthentictionService($window, $http){
+      var saveToken = function(token){
+        $window.localStorage['admin-token'] = token;
+      };
+
+      var getToken = function(){
+        return $window.localStorage['admin-token'];
+      };
+
+      var login = function(user){
+        return $http.post('/api/login', user).success(function(data){
+          saveToken(data.token);
+        });
+      };
+
+      var logout = function(){
+        $window.localStorage.removeItem('admin-token');
+      };
+
+      var isLoggedIn = function(){
+        var token = getToken();
+
+        if(token){
+          var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+          return payload.exp > Date.now() / 1000;
+        }
+        else{
+          return false;
+        }
+      };
+
+      var currentUser = function(){
+        if(isLoggedIn()){
+          var token = getToken();
+          var payload = JSON.parse($window.atob(token.split('.')[1]));
+          return {
+            username: payload.username
+          };
+        }
+      };
+
+      return {
+        login: login,
+        logout: logout,
+        isLoggedIn: isLoggedIn,
+        saveToken: saveToken,
+        getToken: getToken
+      };
+    }
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .service('DataMappingService', DataMappingService);
+
+  DataMappingService.$inject = ['$sce', 'ResponsiveService'];
+  function DataMappingService($sce, ResponsiveService){
+    var service = this;
+
+    ///
+    /// Map the data returned by a project page to its view model.
+    ///
+     service.MapProjectDataToProjectPageVm = function(data){
+      var blogItems = data.pageItems;
+
+      // Sort the list by position
+      blogItems.sort(function(a, b) {
+        return a.position > b.position;
+      });
+
+      // Trust all video links as secure.
+      for(var i = 0; i < data.pageItems.length; i++){
+        if(data.pageItems[i].type === "video"){
+          data.pageItems[i].content = $sce.trustAsResourceUrl(data.pageItems[i].content);
+        }
+      }
+
+      return blogItems;
+    };
+
+    ///
+    /// Take an array of projects and map them to a 2D array of relevent
+    /// project info to be used by the view.
+    ///
+    service.MapProjectsDataToHomePageVm = function(projects){
+      console.log("mapping projects home");
+      if(projects === undefined){
+        console.error("projects is undefined.");
+        return;
+      }
+
+      if(projects.length === 0){
+        console.error("No projects in the projects array.");
+        return;
+      }
+
+      if(Array.isArray(projects) === false){
+        console.error("Array of projects not provided.");
+        return;
+      }
+
+      projects.sort(function(a, b) {
+        return a.position > b.position;
+      });
+
+      var rowSize = ResponsiveService.GetHomePageRowSize();
+      var projectRows = [];
+      var rows = projects.length / rowSize;
+
+      if(rows === 0) rows = 1;
+
+      var projectsIndex = 0;
+      for (var y = 0; y < rows; y++) {
+        projectRows.push([]);
+
+        for(var x = 0; x < rowSize; x++, projectsIndex++){
+          // Break if no projects remaining.
+          if(projectsIndex === projects.length) break;
+
+          projectRows[y].push(projects[ projectsIndex ]);
+        }
+
+        // If only one item in row, full size.
+        if(projectRows[y].length === 1){
+          projectRows[y][0].projectCoverImageAspectRatio = 1;
+        }
+      }
+
+      return projectRows;
+    };
+
+  }
+
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .service('ProjectsService', ProjectsService);
+
+  ProjectsService.$inject = ['$sce', '$http', 'DataMappingService'];
+  function ProjectsService($sce, $http, DataMappingService){
+    var service = this;
+
+    service.allProjectsFilter = undefined;
+    service.designProjectsFilter = "design";
+    service.animationProjectsFilter = "animation";
+    service.illustrationProjectsFilter = "illustration";
+    service.artworkProjectsFilter = "artwork";
+    service.miscProjectsFilter = "misc";
+
+    ///
+    /// Get all the projects raw data
+    ///
+    service.GetAllProjects = function(callback){
+      console.log("getting all projects");
+      $http.get('/api/projects/').then(
+        function(response){
+          if(response.status === 200){
+
+            response.data.sort(function(a, b) {
+              return a.position > b.position;
+            });
+
+            callback(response.data);
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting all projects.");
+          // TODO: Redirect to 404 not found.
+      });
+    };
+
+    ///
+    /// Get a project by its id.
+    ///
+    service.GetProject = function(projectId, callback){
+
+      $http.get('/api/projects/' + projectId).then(
+        function(response){
+          if(response.status === 200){
+            callback(response.data);
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting project page " + projectId);
+          // TODO: Redirect to 404 not found.
+      });
+    };
+
+    ///
+    /// Get a project page by its id.
+    ///
+    service.GetProjectPage = function(projectId, callback){
+
+      $http.get('/api/projects/' + projectId).then(
+        function(response){
+          if(response.status === 200){
+            callback(DataMappingService.MapProjectDataToProjectPageVm(response.data));
+          }
+        },
+        function(response){
+          console.error("Something went wrong getting project page " + projectId);
+          // TODO: Redirect to 404 not found.
+      });
+    };
+
+    ///
+    /// Get all projects as they are needed on the home page.
+    ///
+    service.GetProjectsHomePage = function(category, callback){
+      console.log("getting projects home page from service");
+      $http.get('/api/projects/').then(
+        function(response){
+          if(response.status === 200){
+            var filteredProjectsList = FilterProjectsByCategory(response.data, category);
+            var mapped =  DataMappingService.MapProjectsDataToHomePageVm(filteredProjectsList);
+
+            callback(mapped);
+          }
+        },
+        function(response){
+          console.log("Something went wrong while getting all projects.");
+      });
+    };
+
+    ///
+    /// Filter the projects by the provided category.
+    ///
+    var FilterProjectsByCategory = function(projects, category){
+      var filteredProjects = [];
+
+      if(category === service.allProjectsFilter){
+        return projects;
+      }
+
+      for(var i = 0; i < projects.length; i++){
+        // If the project category matches, add it to our results.
+        if(projects[i].category === category){
+          filteredProjects.push(projects[i]);
+        }
+      }
+
+      return filteredProjects;
+    };
+  }
+
+})();
+
+(function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .service('ResponsiveService', ResponsiveService);
+
+  ResponsiveService.$inject = ['$window'];
+  function ResponsiveService($window){
+    var service = this;
+
+    var smallScreenMax = 900;
+    var mediumScreenMax = 1500;
+
+    ///
+    /// Get the number of projects we want to show in a row based on how
+    /// big the screen is.
+    ///
+    service.GetHomePageRowSize = function(){
+      console.log("getting home page row size");
+      var rowSize = 1;
+
+      if($window.innerWidth > smallScreenMax){
+        rowSize = 2;
+      }
+
+      if($window.innerWidth > mediumScreenMax){
+        rowSize = 3;
+      }
+
+      return rowSize;
+    };
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .service('UploadService', UploadService);
+
+    UploadService.$inject = ['$http', 'AuthentictionService'];
+    function UploadService($http, AuthentictionService){
+      service = this;
+
+      service.uploadImage = function(fileData, successCB, errorCB){
+
+        var fd = new FormData();
+        fd.append('file', fileData);
+        $http.post("/api/upload", fd, {
+            transformRequest: angular.identity,
+            headers: {
+              'Content-Type': undefined,
+              Authorization: 'Bearer ' + AuthentictionService.getToken()
+            }
+        })
+        .success(function(response){
+          successCB(response);
+        })
+        .error(function(response){
+          errorCB(response);
+        });
+      };
+
+    }
 })();
 
 (function(){
@@ -408,328 +737,6 @@ function loginCtrl($location, AuthentictionService){
     };
   }
 
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .service('AuthentictionService', AuthentictionService);
-
-    AuthentictionService.$inject = ['$window', '$http'];
-    function AuthentictionService($window, $http){
-      var saveToken = function(token){
-        $window.localStorage['admin-token'] = token;
-      };
-
-      var getToken = function(){
-        return $window.localStorage['admin-token'];
-      };
-
-      var login = function(user){
-        return $http.post('/api/login', user).success(function(data){
-          saveToken(data.token);
-        });
-      };
-
-      var logout = function(){
-        $window.localStorage.removeItem('admin-token');
-      };
-
-      var isLoggedIn = function(){
-        var token = getToken();
-
-        if(token){
-          var payload = JSON.parse($window.atob(token.split('.')[1]));
-
-          return payload.exp > Date.now() / 1000;
-        }
-        else{
-          return false;
-        }
-      };
-
-      var currentUser = function(){
-        if(isLoggedIn()){
-          var token = getToken();
-          var payload = JSON.parse($window.atob(token.split('.')[1]));
-          return {
-            username: payload.username
-          };
-        }
-      };
-
-      return {
-        login: login,
-        logout: logout,
-        isLoggedIn: isLoggedIn,
-        saveToken: saveToken,
-        getToken: getToken
-      };
-    }
-})();
-
-(function(){
-
-  angular
-    .module('PortfolioSPAModule')
-    .service('DataMappingService', DataMappingService);
-
-  DataMappingService.$inject = ['$sce', 'ResponsiveService'];
-  function DataMappingService($sce, ResponsiveService){
-    var service = this;
-
-    ///
-    /// Map the data returned by a project page to its view model.
-    ///
-     service.MapProjectDataToProjectPageVm = function(data){
-      var blogItems = data.pageItems;
-
-      // Sort the list by position
-      blogItems.sort(function(a, b) {
-        return a.position > b.position;
-      });
-
-      // Trust all video links as secure.
-      for(var i = 0; i < data.pageItems.length; i++){
-        if(data.pageItems[i].type === "video"){
-          data.pageItems[i].content = $sce.trustAsResourceUrl(data.pageItems[i].content);
-        }
-      }
-
-      return blogItems;
-    };
-
-    ///
-    /// Take an array of projects and map them to a 2D array of relevent
-    /// project info to be used by the view.
-    ///
-    service.MapProjectsDataToHomePageVm = function(projects){
-      if(projects === undefined){
-        console.error("projects is undefined.");
-        return;
-      }
-
-      if(projects.length === 0){
-        console.error("No projects in the projects array.");
-        return;
-      }
-
-      if(Array.isArray(projects) === false){
-        console.error("Array of projects not provided.");
-        return;
-      }
-
-      projects.sort(function(a, b) {
-        return a.position > b.position;
-      });
-
-      var rowSize = ResponsiveService.GetHomePageRowSize();
-      var projectRows = [];
-      var rows = projects.length / rowSize;
-
-      if(rows === 0) rows = 1;
-
-      var projectsIndex = 0;
-      for (var y = 0; y < rows; y++) {
-        projectRows.push([]);
-
-        for(var x = 0; x < rowSize; x++, projectsIndex++){
-          // Break if no projects remaining.
-          if(projectsIndex === projects.length) break;
-
-          projectRows[y].push(projects[ projectsIndex ]);
-        }
-
-        // If only one item in row, full size.
-        if(projectRows[y].length === 1){
-          projectRows[y][0].projectCoverImageAspectRatio = 1;
-        }
-      }
-
-      return projectRows;
-    };
-
-  }
-
-})();
-
-(function(){
-
-  angular
-    .module('PortfolioSPAModule')
-    .service('ProjectsService', ProjectsService);
-
-  ProjectsService.$inject = ['$sce', '$http', 'DataMappingService'];
-  function ProjectsService($sce, $http, DataMappingService){
-    var service = this;
-
-    service.allProjectsFilter = undefined;
-    service.designProjectsFilter = "design";
-    service.animationProjectsFilter = "animation";
-    service.illustrationProjectsFilter = "illustration";
-    service.artworkProjectsFilter = "artwork";
-    service.miscProjectsFilter = "misc";
-
-    ///
-    /// Get all the projects raw data
-    ///
-    service.GetAllProjects = function(callback){
-      $http.get('/api/projects/').then(
-        function(response){
-          if(response.status === 200){
-
-            response.data.sort(function(a, b) {
-              return a.position > b.position;
-            });
-
-            callback(response.data);
-          }
-        },
-        function(response){
-          console.error("Something went wrong getting all projects.");
-          // TODO: Redirect to 404 not found.
-      });
-    };
-
-    ///
-    /// Get a project by its id.
-    ///
-    service.GetProject = function(projectId, callback){
-
-      $http.get('/api/projects/' + projectId).then(
-        function(response){
-          if(response.status === 200){
-            callback(response.data);
-          }
-        },
-        function(response){
-          console.error("Something went wrong getting project page " + projectId);
-          // TODO: Redirect to 404 not found.
-      });
-    };
-
-    ///
-    /// Get a project page by its id.
-    ///
-    service.GetProjectPage = function(projectId, callback){
-
-      $http.get('/api/projects/' + projectId).then(
-        function(response){
-          if(response.status === 200){
-            callback(DataMappingService.MapProjectDataToProjectPageVm(response.data));
-          }
-        },
-        function(response){
-          console.error("Something went wrong getting project page " + projectId);
-          // TODO: Redirect to 404 not found.
-      });
-    };
-
-    ///
-    /// Get all projects as they are needed on the home page.
-    ///
-    service.GetProjectsHomePage = function(category, callback){
-
-      $http.get('/api/projects/').then(
-        function(response){
-          if(response.status === 200){
-            var filteredProjectsList = FilterProjectsByCategory(response.data, category);
-            var mapped =  DataMappingService.MapProjectsDataToHomePageVm(filteredProjectsList);
-
-            callback(mapped);
-          }
-        },
-        function(response){
-          console.log("Something went wrong while getting all projects.");
-      });
-    };
-
-    ///
-    /// Filter the projects by the provided category.
-    ///
-    var FilterProjectsByCategory = function(projects, category){
-      var filteredProjects = [];
-
-      if(category === service.allProjectsFilter){
-        return projects;
-      }
-
-      for(var i = 0; i < projects.length; i++){
-        // If the project category matches, add it to our results.
-        if(projects[i].category === category){
-          filteredProjects.push(projects[i]);
-        }
-      }
-
-      return filteredProjects;
-    };
-  }
-
-})();
-
-(function(){
-
-  angular
-    .module('PortfolioSPAModule')
-    .service('ResponsiveService', ResponsiveService);
-
-  ResponsiveService.$inject = ['$window'];
-  function ResponsiveService($window){
-    var service = this;
-
-    var smallScreenMax = 900;
-    var mediumScreenMax = 1500;
-
-    ///
-    /// Get the number of projects we want to show in a row based on how
-    /// big the screen is.
-    ///
-    service.GetHomePageRowSize = function(){
-      var rowSize = 1;
-
-      if($window.innerWidth > smallScreenMax){
-        rowSize = 2;
-      }
-
-      if($window.innerWidth > mediumScreenMax){
-        rowSize = 3;
-      }
-
-      return rowSize;
-    };
-  }
-
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .service('UploadService', UploadService);
-
-    UploadService.$inject = ['$http', 'AuthentictionService'];
-    function UploadService($http, AuthentictionService){
-      service = this;
-
-      service.uploadImage = function(fileData, successCB, errorCB){
-
-        var fd = new FormData();
-        fd.append('file', fileData);
-        $http.post("/api/upload", fd, {
-            transformRequest: angular.identity,
-            headers: {
-              'Content-Type': undefined,
-              Authorization: 'Bearer ' + AuthentictionService.getToken()
-            }
-        })
-        .success(function(response){
-          successCB(response);
-        })
-        .error(function(response){
-          errorCB(response);
-        });
-      };
-
-    }
 })();
 
 (function(){

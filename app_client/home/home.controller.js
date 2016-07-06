@@ -11,6 +11,8 @@
     var viewModel = this;
     var categoryFilter = $location.search().category; // Once per 'page load'
 
+    console.log("entering home page controller");
+
     viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
     viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
 
@@ -26,6 +28,7 @@
     /// according to screen size).
     /// TODO: Only get projects when resizing is done so we're not making a million calls.
     ///
+    /*
     angular.element($window).bind('resize', function () {
       // Possiblity to cache here... if necessary.
       ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
@@ -33,6 +36,7 @@
         //$scope.$apply(); // Not needed... two way bind automatically digests.
       });
     });
+    */
   }
 
 })();
