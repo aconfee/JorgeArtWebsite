@@ -6,7 +6,7 @@
   <h1 ng-show="viewModel.projects === undefined">Sorry, no projects could be found here.</h1>
 
   <div class="flex-group-container" ng-repeat="row in viewModel.projects">
-    <div class="flex-item-container" style="flex:{{ project.projectCoverImageAspectRatio }}" ng-repeat="project in row">
+    <div class="flex-item-container" style="flex:{{ project.projectCoverImageAspectRatio }} 0 0; -webkit-flex:{{ project.projectCoverImageAspectRatio }} 0 0; -moz-flex:{{ project.projectCoverImageAspectRatio }} 0 0; -ms-flex:{{ project.projectCoverImageAspectRatio }} 0 0; -o-flex:{{ project.projectCoverImageAspectRatio }} 0 0;" ng-repeat="project in row">
       <a href="/projects/{{ project._id }}">
         <img src="{{ project.projectCoverImage }}"></img>
         <div class="project-cover-image">

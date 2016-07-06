@@ -16,6 +16,10 @@ a {
 
 .flex-group-container {
   width: 100%;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
   display: flex; }
   .flex-group-container .flex-item-container {
     position: relative;
@@ -60,7 +64,11 @@ a {
   max-width: 1600px; }
 
 .single-row-image {
-  flex: 1; }
+  -webkit-flex: 1 0 0;
+  -moz-flex: 1 0 0;
+  -ms-flex: 1 0 0;
+  -o-flex: 1 0 0;
+  flex: 1 0 0; }
 
 .glyphicon:hover {
   color: blue;
