@@ -735,28 +735,6 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('fileModel', ['$parse', fileModel]);
-
-  function fileModel($parse){
-    return{
-      restrict:'A',
-      link: function(scope, element, attrs){
-        var model = $parse(attrs.fileModel);
-        var modelSetter = model.assign;
-
-        element.bind('change', function(){
-          scope.$apply(function(){
-            modelSetter(scope, element[0].files[0]);
-          });
-        });
-      }
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
     .directive('adminHeader', adminHeader);
 
   function adminHeader(){
@@ -789,6 +767,22 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('coverImage', coverImage);
+
+  function coverImage(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('embededVideo', embededVideo);
 
   function embededVideo(){
@@ -805,15 +799,21 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('coverImage', coverImage);
+    .directive('fileModel', ['$parse', fileModel]);
 
-  function coverImage(){
+  function fileModel($parse){
     return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
+      restrict:'A',
+      link: function(scope, element, attrs){
+        var model = $parse(attrs.fileModel);
+        var modelSetter = model.assign;
+
+        element.bind('change', function(){
+          scope.$apply(function(){
+            modelSetter(scope, element[0].files[0]);
+          });
+        });
+      }
     };
   }
 })();
