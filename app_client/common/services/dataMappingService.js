@@ -34,7 +34,6 @@
     /// project info to be used by the view.
     ///
     service.MapProjectsDataToHomePageVm = function(projects){
-      console.log("mapping projects home");
       if(projects === undefined){
         console.error("projects is undefined.");
         return;

@@ -75,7 +75,6 @@
     /// Get all projects as they are needed on the home page.
     ///
     service.GetProjectsHomePage = function(category, callback){
-      console.log("getting projects home page from service");
       $http.get('/api/projects/').then(
         function(response){
           if(response.status === 200){

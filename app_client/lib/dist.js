@@ -69,48 +69,62 @@ function aboutController($scope){
   viewModel.myVariable = "I'm pretty cool, I guess.";
 }
 
-angular
-  .module('PortfolioSPAModule')
-  .controller('loginCtrl', loginCtrl);
+// Using function scopes to prevent global scope variables.
+// God, I can't wait to use typescript.
+(function(){
 
-loginCtrl.$inject = ['$location', 'AuthentictionService'];
-function loginCtrl($location, AuthentictionService){
-  var viewModel = this;
+  angular
+    .module('PortfolioSPAModule')
+    .controller('homeController', homeController);
 
-  viewModel.pageHeader = {
-    title: 'Admin Sign In'
-  };
+  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsService', 'ResponsiveService'];
+  function homeController($scope, $window, $location, $sce, ProjectsService, ResponsiveService){
+    var viewModel = this;
+    var categoryFilter = $location.search().category; // Once per 'page load'
 
-  viewModel.credentials = {
-    username: "",
-    password: ""
-  };
+    // For row resize.
+    var currentWidth = $window.innerWidth;
+    var rowSize = ResponsiveService.GetHomePageRowSize();
 
-  viewModel.returnPage = '/admin'; // Go to admin page once logged in.
-  viewModel.onSubmit = function(){
-    viewModel.formError = "";
-    if(!viewModel.credentials.username || !viewModel.credentials.password){
-      viewModel.formError = "All fields required.";
-      return false;
-    }
-    else{
-      viewModel.doLogin();
-    }
-  };
+    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
 
-  viewModel.doLogin = function(){
-    viewModel.formError = "";
-    AuthentictionService
-      .login(viewModel.credentials)
-      .error(function(err){
-        viewModel.formError = err.message;
-      })
-      .then(function(){
-        //$location.search('page', null); no need to get query param for return page.
-        $location.path(viewModel.returnPage);
+    ///
+    /// Request the projects to disply on the home page.
+    ///
+    ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+      viewModel.projects = projectsVm;
+    });
+
+    ///
+    /// Adjust the row sizes if need be.
+    ///
+    angular.element($window).bind('resize', function () {
+
+      // Don't resize if width hasn't changed.
+      if($window.innerWidth === currentWidth){
+        return;
+      }
+
+      // Don't resize if we don't actually need to adjust row size.
+      if(rowSize === ResponsiveService.GetHomePageRowSize()){
+        return;
+      }
+
+      console.log("resizing");
+
+      currentWidth = $window.innerWidth;
+      rowSize = ResponsiveService.GetHomePageRowSize();
+
+      // Possiblity to cache here... if necessary.
+      ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
+        viewModel.projects = projectsVm;
+        //$scope.$apply(); // Not needed... two way bind automatically digests.
       });
-  };
-}
+    });
+  }
+
+})();
 
 (function(){
 
@@ -173,48 +187,48 @@ function loginCtrl($location, AuthentictionService){
 
 })();
 
-// Using function scopes to prevent global scope variables.
-// God, I can't wait to use typescript.
-(function(){
+angular
+  .module('PortfolioSPAModule')
+  .controller('loginCtrl', loginCtrl);
 
-  angular
-    .module('PortfolioSPAModule')
-    .controller('homeController', homeController);
+loginCtrl.$inject = ['$location', 'AuthentictionService'];
+function loginCtrl($location, AuthentictionService){
+  var viewModel = this;
 
-  homeController.$inject = ['$scope', '$window', '$location', '$sce', 'ProjectsService'];
-  function homeController($scope, $window, $location, $sce, ProjectsService){
-    var viewModel = this;
-    var categoryFilter = $location.search().category; // Once per 'page load'
+  viewModel.pageHeader = {
+    title: 'Admin Sign In'
+  };
 
-    console.log("entering home page controller");
+  viewModel.credentials = {
+    username: "",
+    password: ""
+  };
 
-    viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
-    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
+  viewModel.returnPage = '/admin'; // Go to admin page once logged in.
+  viewModel.onSubmit = function(){
+    viewModel.formError = "";
+    if(!viewModel.credentials.username || !viewModel.credentials.password){
+      viewModel.formError = "All fields required.";
+      return false;
+    }
+    else{
+      viewModel.doLogin();
+    }
+  };
 
-    ///
-    /// Request the projects to disply on the home page.
-    ///
-    ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
-      viewModel.projects = projectsVm;
-    });
-
-    ///
-    /// Re-get the projects if page is resized (getting projects will rebuild the rows
-    /// according to screen size).
-    /// TODO: Only get projects when resizing is done so we're not making a million calls.
-    ///
-    /*
-    angular.element($window).bind('resize', function () {
-      // Possiblity to cache here... if necessary.
-      ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
-        viewModel.projects = projectsVm;
-        //$scope.$apply(); // Not needed... two way bind automatically digests.
+  viewModel.doLogin = function(){
+    viewModel.formError = "";
+    AuthentictionService
+      .login(viewModel.credentials)
+      .error(function(err){
+        viewModel.formError = err.message;
+      })
+      .then(function(){
+        //$location.search('page', null); no need to get query param for return page.
+        $location.path(viewModel.returnPage);
       });
-    });
-    */
-  }
-
-})();
+  };
+}
 
 (function(){
   angular
@@ -310,7 +324,6 @@ function loginCtrl($location, AuthentictionService){
     /// project info to be used by the view.
     ///
     service.MapProjectsDataToHomePageVm = function(projects){
-      console.log("mapping projects home");
       if(projects === undefined){
         console.error("projects is undefined.");
         return;
@@ -437,7 +450,6 @@ function loginCtrl($location, AuthentictionService){
     /// Get all projects as they are needed on the home page.
     ///
     service.GetProjectsHomePage = function(category, callback){
-      console.log("getting projects home page from service");
       $http.get('/api/projects/').then(
         function(response){
           if(response.status === 200){
@@ -493,7 +505,6 @@ function loginCtrl($location, AuthentictionService){
     /// big the screen is.
     ///
     service.GetHomePageRowSize = function(){
-      console.log("getting home page row size");
       var rowSize = 1;
 
       if($window.innerWidth > smallScreenMax){
@@ -742,6 +753,149 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('fileModel', ['$parse', fileModel]);
+
+  function fileModel($parse){
+    return{
+      restrict:'A',
+      link: function(scope, element, attrs){
+        var model = $parse(attrs.fileModel);
+        var modelSetter = model.assign;
+
+        element.bind('change', function(){
+          scope.$apply(function(){
+            modelSetter(scope, element[0].files[0]);
+          });
+        });
+      }
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('embededVideo', embededVideo);
+
+  function embededVideo(){
+    return{
+      restrict:'EA',
+      scope:{
+        embededUrl: '=embededUrl'
+      },
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .controller('imageGalleryController', imageGalleryController)
+    .directive('imageGallery', imageGallery);
+
+  function imageGallery(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content',
+        selectedImage: '=selectedImage'
+      },
+      templateUrl: '/common/directives/imageGallery/imageGallery.directive.html',
+      controller: imageGalleryController,
+      controllerAs: 'ctrl'
+    };
+  }
+
+  ///
+  /// Define a controller for this image gallery to use.
+  ///
+  imageGalleryController.$inject = ['$scope', '$window'];
+  function imageGalleryController($scope, $window){
+    var ctrl = this;
+    var tinyScreenMax = 600;
+    var smallScreenMax = 650;
+    var mediumScreenMax = 1000;
+
+    var GetNumberOfColumns = function(){
+      var numCols = 2;
+
+      //if($window.innerWidth > tinyScreenMax){
+        numCols = 2;
+      //}
+      if($window.innerWidth > smallScreenMax){
+        numCols = 3;
+      }
+      if($window.innerWidth > mediumScreenMax){
+        numCols = 4;
+      }
+
+      return numCols;
+    };
+
+    // For row resize.
+    var currentWidth = $window.innerWidth;
+    var numColumns = GetNumberOfColumns();
+
+    // Never really want more than 4 columns or balance starts to look shit.
+    ctrl.lightboxImage = "";
+
+    ctrl.GalleryThumbClick = function(image){
+      // Set modal image
+      $scope.selectedImage = image;
+    };
+
+    angular.element($window).bind('resize', function () {
+
+      // Don't resize if width hasn't changed.
+      if($window.innerWidth === currentWidth){
+        return;
+      }
+
+      // Don't resize if we don't actually need to adjust row size.
+      if(numColumns === GetNumberOfColumns()){
+        return;
+      }
+
+      currentWidth = $window.innerWidth;
+      numColumns = GetNumberOfColumns();
+
+      console.log("resizing");
+      // Possiblity to cache here... if necessary.
+      ctrl.imageThumbs = FormatImageList($scope.content); // format images with new number of columns based on screen size.
+      $scope.$apply(); // This is needed here... will occasionally update on its own.
+    });
+
+    var FormatImageList = function(images){
+      var columns = [];
+      var numColumns = GetNumberOfColumns();
+      var rows = Math.ceil(images.length / numColumns);
+
+      var imagesIndex = 0;
+      for (var y = 0; y < rows; y++) {
+        for(var x = 0; x < numColumns; x++, imagesIndex++){
+          if(columns[x] === undefined){
+            columns.push([]);
+          }
+
+          // Break if no projects remaining.
+          if(imagesIndex === images.length) break;
+
+          columns[x].push(images[ imagesIndex ]);
+        }
+      }
+
+      return columns;
+    };
+
+    ctrl.imageThumbs = FormatImageList($scope.content);
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('adminHeader', adminHeader);
 
   function adminHeader(){
@@ -790,123 +944,29 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
+    .directive('navigationBar', navigationBar);
 
-  function embededVideo(){
+  function navigationBar(){
     return{
       restrict:'EA',
-      scope:{
-        embededUrl: '=embededUrl'
-      },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('fileModel', ['$parse', fileModel]);
-
-  function fileModel($parse){
-    return{
-      restrict:'A',
-      link: function(scope, element, attrs){
-        var model = $parse(attrs.fileModel);
-        var modelSetter = model.assign;
-
-        element.bind('change', function(){
-          scope.$apply(function(){
-            modelSetter(scope, element[0].files[0]);
-          });
-        });
-      }
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .controller('imageGalleryController', imageGalleryController)
-    .directive('imageGallery', imageGallery);
-
-  function imageGallery(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content',
-        selectedImage: '=selectedImage'
-      },
-      templateUrl: '/common/directives/imageGallery/imageGallery.directive.html',
-      controller: imageGalleryController,
+      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
+      controller: navigationBarController,
       controllerAs: 'ctrl'
     };
   }
 
-  ///
-  /// Define a controller for this image gallery to use.
-  ///
-  imageGalleryController.$inject = ['$scope', '$window'];
-  function imageGalleryController($scope, $window){
+  navigationBarController.$inject = ['$location'];
+  function navigationBarController($location){
     var ctrl = this;
-    var tinyScreenMax = 600;
-    var smallScreenMax = 650;
-    var mediumScreenMax = 1000;
-    // Never really want more than 4 columns or balance starts to look shit.
-    ctrl.lightboxImage = "";
 
-    ctrl.GalleryThumbClick = function(image){
-      // Set modal image
-      $scope.selectedImage = image;
-    };
-
-    angular.element($window).bind('resize', function () {
-      console.log("resizing");
-      // Possiblity to cache here... if necessary.
-      ctrl.imageThumbs = FormatImageList($scope.content); // format images with new number of columns based on screen size.
-      $scope.$apply(); // This is needed here... will occasionally update on its own.
-    });
-
-    var GetNumberOfColumns = function(){
-      var numCols = 2;
-
-      //if($window.innerWidth > tinyScreenMax){
-        numCols = 2;
-      //}
-      if($window.innerWidth > smallScreenMax){
-        numCols = 3;
-      }
-      if($window.innerWidth > mediumScreenMax){
-        numCols = 4;
+    ctrl.isActive = function(path){
+      if(path.length === 1){
+        // If checking if we're on homepage...
+        return $location.path() === '/' && $location.search().category === undefined;
       }
 
-      return numCols;
+      return $location.absUrl().indexOf(path) != -1;
     };
-
-    var FormatImageList = function(images){
-      var columns = [];
-      var numColumns = GetNumberOfColumns();
-      var rows = Math.ceil(images.length / numColumns);
-
-      var imagesIndex = 0;
-      for (var y = 0; y < rows; y++) {
-        for(var x = 0; x < numColumns; x++, imagesIndex++){
-          if(columns[x] === undefined){
-            columns.push([]);
-          }
-
-          // Break if no projects remaining.
-          if(imagesIndex === images.length) break;
-
-          columns[x].push(images[ imagesIndex ]);
-        }
-      }
-
-      return columns;
-    };
-
-    ctrl.imageThumbs = FormatImageList($scope.content);
   }
 
 })();
@@ -945,36 +1005,6 @@ function loginCtrl($location, AuthentictionService){
         $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
       });
     });
-  }
-
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('navigationBar', navigationBar);
-
-  function navigationBar(){
-    return{
-      restrict:'EA',
-      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
-      controller: navigationBarController,
-      controllerAs: 'ctrl'
-    };
-  }
-
-  navigationBarController.$inject = ['$location'];
-  function navigationBarController($location){
-    var ctrl = this;
-
-    ctrl.isActive = function(path){
-      if(path.length === 1){
-        // If checking if we're on homepage...
-        return $location.path() === '/' && $location.search().category === undefined;
-      }
-
-      return $location.absUrl().indexOf(path) != -1;
-    };
   }
 
 })();

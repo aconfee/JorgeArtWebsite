@@ -16,7 +16,6 @@
     /// big the screen is.
     ///
     service.GetHomePageRowSize = function(){
-      console.log("getting home page row size");
       var rowSize = 1;
 
       if($window.innerWidth > smallScreenMax){
