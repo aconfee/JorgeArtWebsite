@@ -23,6 +23,7 @@ module.exports.upload = multer({
   })
 });
 
+// Here's a pointless change.
 module.exports.uploadImage = function(req, res){
   res.status(200);
   res.json({ filepath: req.files[0].location });
