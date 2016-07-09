@@ -117,17 +117,6 @@ a {
   max-width: 200px;
   display: inline-block; }
 
-.cover-image-container {
-  display: flex;
-  width: 100%;
-  padding: 5px; }
-
-.cover-image {
-  flex: 1; }
-  .cover-image img {
-    width: 100%;
-    height: auto; }
-
 .video-container {
   position: relative;
   padding-bottom: 56.25%;
@@ -194,6 +183,17 @@ a {
   transform: translate3d(0, -300px, 0);
   opacity: 1; }
 
+.cover-image-container {
+  display: flex;
+  width: 100%;
+  padding: 5px; }
+
+.cover-image {
+  flex: 1; }
+  .cover-image img {
+    width: 100%;
+    height: auto; }
+
 .navbar-default .navbar-nav > .active {
   color: #000;
   background: white;
@@ -240,12 +240,12 @@ a {
   color: black;
   cursor: pointer; }
 
+.text-block {
+  margin: 50px 5%; }
+
 .underline-page-break {
   border-bottom: 2px solid silver;
   margin-top: 20px;
   margin-bottom: 30px;
   margin-left: 10%;
   margin-right: 10%; }
-
-.text-block {
-  margin: 50px 5%; }

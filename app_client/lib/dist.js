@@ -394,7 +394,6 @@ function loginCtrl($location, AuthentictionService){
     /// Get all the projects raw data
     ///
     service.GetAllProjects = function(callback){
-      console.log("getting all projects");
       $http.get('/api/projects/').then(
         function(response){
           if(response.status === 200){
@@ -753,6 +752,22 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('embededVideo', embededVideo);
+
+  function embededVideo(){
+    return{
+      restrict:'EA',
+      scope:{
+        embededUrl: '=embededUrl'
+      },
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('fileModel', ['$parse', fileModel]);
 
   function fileModel($parse){
@@ -768,22 +783,6 @@ function loginCtrl($location, AuthentictionService){
           });
         });
       }
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
-
-  function embededVideo(){
-    return{
-      restrict:'EA',
-      scope:{
-        embededUrl: '=embededUrl'
-      },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
     };
   }
 })();
@@ -928,6 +927,44 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('imageLightbox', imageLightbox);
+
+  function imageLightbox(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html',
+      controller: imageLightboxController,
+      controllerAs: 'viewModel'
+    };
+  }
+
+  imageLightboxController.$inject = [];
+  function imageLightboxController(){
+    var ctrl = this;
+    ctrl.imageWidth = "";
+
+    $(document).ready(function(){
+
+      $('#lightbox').on('shown.bs.modal', function () {
+
+        var screenImage = $("#lightbox img");
+        var theImage = new Image();
+        theImage.src = screenImage.attr("src");
+        ctrl.imageWidth = theImage.width;
+
+        $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
+      });
+    });
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('coverImage', coverImage);
 
   function coverImage(){
@@ -974,39 +1011,17 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
+    .directive('textBlock', textBlock);
 
-  function imageLightbox(){
+  function textBlock(){
     return{
       restrict:'EA',
       scope:{
         content: '=content'
       },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html',
-      controller: imageLightboxController,
-      controllerAs: 'viewModel'
+      templateUrl: '/common/directives/textBlock/textBlock.directive.html'
     };
   }
-
-  imageLightboxController.$inject = [];
-  function imageLightboxController(){
-    var ctrl = this;
-    ctrl.imageWidth = "";
-
-    $(document).ready(function(){
-
-      $('#lightbox').on('shown.bs.modal', function () {
-
-        var screenImage = $("#lightbox img");
-        var theImage = new Image();
-        theImage.src = screenImage.attr("src");
-        ctrl.imageWidth = theImage.width;
-
-        $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
-      });
-    });
-  }
-
 })();
 
 (function(){
@@ -1018,22 +1033,6 @@ function loginCtrl($location, AuthentictionService){
     return{
       restrict:'EA',
       templateUrl: '/common/directives/pageBreak/underline.directive.html'
-    };
-  }
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('textBlock', textBlock);
-
-  function textBlock(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/textBlock/textBlock.directive.html'
     };
   }
 })();

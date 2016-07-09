@@ -19,7 +19,6 @@
     /// Get all the projects raw data
     ///
     service.GetAllProjects = function(callback){
-      console.log("getting all projects");
       $http.get('/api/projects/').then(
         function(response){
           if(response.status === 200){
