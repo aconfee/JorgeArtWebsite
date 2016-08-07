@@ -16,6 +16,7 @@
     var rowSize = ResponsiveService.GetHomePageRowSize();
 
     viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
+    viewModel.coverImage = "./images/cover.png";
     viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
 
     ///

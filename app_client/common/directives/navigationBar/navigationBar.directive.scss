@@ -1,31 +1,36 @@
+$textColor: black;
+$backgroundColor: white;
+
 .navbar-default .navbar-nav > .active{
-   color: #000;
-  background: white;
+   color: $textColor;
+  background: $backgroundColor;
   font-weight: bold;
 }
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-     color: #000;
-     background: white;
+     color: $textColor;
+     background: $backgroundColor;
 } .navbar-default .navbar-nav > .active{
-    color: #000;
-   background: white;
+    color: $textColor;
+   background: $backgroundColor;
  }
  .navbar-default .navbar-nav > .active > a,
  .navbar-default .navbar-nav > .active > a:hover,
  .navbar-default .navbar-nav > .active > a:focus {
-      color: #000;
-      background: white;
+      color: $textColor;
+      background: $backgroundColor;
  }
 
 .navbar-default{
-	background-color:white;
+	background-color:$backgroundColor;
 	opacity: 1;
 	letter-spacing:0.11em;
 	text-align: center;
 
+  /* Uncomment shadow and make border color white to return to normal */
 	box-shadow: 0px 0px 10px #888888;
+  border-color: white;
 }
 
 .navbar .nav,
@@ -43,6 +48,6 @@
 }
 
 .navbar .nav > li > a:hover {
-	color: black;
+	color: $textColor;
 	cursor: pointer;
 }

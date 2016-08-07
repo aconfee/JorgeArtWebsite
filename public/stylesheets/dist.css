@@ -8,6 +8,7 @@ body {
   padding: 50px;
   font-size: 1.7em;
   color: #232323;
+  background-color: white;
   font-family: "openSansLight", "Oxygen", sans-serif; }
 
 a {
@@ -117,6 +118,17 @@ a {
   max-width: 200px;
   display: inline-block; }
 
+.cover-image-container {
+  display: flex;
+  width: 100%;
+  padding: 5px; }
+
+.cover-image {
+  flex: 1; }
+  .cover-image img {
+    width: 100%;
+    height: auto; }
+
 .video-container {
   position: relative;
   padding-bottom: 56.25%;
@@ -183,36 +195,25 @@ a {
   transform: translate3d(0, -300px, 0);
   opacity: 1; }
 
-.cover-image-container {
-  display: flex;
-  width: 100%;
-  padding: 5px; }
-
-.cover-image {
-  flex: 1; }
-  .cover-image img {
-    width: 100%;
-    height: auto; }
-
 .navbar-default .navbar-nav > .active {
-  color: #000;
+  color: black;
   background: white;
   font-weight: bold; }
 
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: #000;
+  color: black;
   background: white; }
 
 .navbar-default .navbar-nav > .active {
-  color: #000;
+  color: black;
   background: white; }
 
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: #000;
+  color: black;
   background: white; }
 
 .navbar-default {
@@ -220,7 +221,9 @@ a {
   opacity: 1;
   letter-spacing: 0.11em;
   text-align: center;
-  box-shadow: 0px 0px 10px #888888; }
+  /* Uncomment shadow and make border color white to return to normal */
+  box-shadow: 0px 0px 10px #888888;
+  border-color: white; }
 
 .navbar .nav,
 .navbar .nav > li {
@@ -240,12 +243,12 @@ a {
   color: black;
   cursor: pointer; }
 
-.text-block {
-  margin: 50px 5%; }
-
 .underline-page-break {
   border-bottom: 2px solid silver;
   margin-top: 20px;
   margin-bottom: 30px;
   margin-left: 10%;
   margin-right: 10%; }
+
+.text-block {
+  margin: 50px 5%; }

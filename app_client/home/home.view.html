@@ -1,7 +1,7 @@
 <navigation-bar></navigation-bar>
 
 <div class="home-page-container">
-  <embeded-video embeded-url="viewModel.videoLink" ng-show="viewModel.showVideo"></embeded-video>
+  <cover-image ng-show="viewModel.projects === undefined" content="viewModel.coverImage"></cover-image>
   <underline-page-break ng-show="viewModel.showVideo"></underline-page-break>
   <h1 ng-show="viewModel.projects === undefined">Sorry, no projects could be found here.</h1>
 
@@ -16,3 +16,7 @@
     </div>
   </div>
 </div>
+
+<br />
+<br />
+<div style="text-align:center">All content &copy; 2016 Jorge Almeida, all rights reserved.</div>

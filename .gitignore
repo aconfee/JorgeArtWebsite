@@ -7,3 +7,5 @@ node_modules
 # Uploaded images
 public/images/*
 !public/images/dummy.jpg
+!public/images/cover.png
+!public/images/logo.png
