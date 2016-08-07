@@ -88,7 +88,7 @@ function aboutController($scope){
 
     viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
     viewModel.coverImage = "./images/cover.png";
-    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
+    viewModel.showCover = categoryFilter === undefined; // Promo on 'all' page.
 
     ///
     /// Request the projects to disply on the home page.
@@ -839,6 +839,44 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('imageLightbox', imageLightbox);
+
+  function imageLightbox(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html',
+      controller: imageLightboxController,
+      controllerAs: 'viewModel'
+    };
+  }
+
+  imageLightboxController.$inject = [];
+  function imageLightboxController(){
+    var ctrl = this;
+    ctrl.imageWidth = "";
+
+    $(document).ready(function(){
+
+      $('#lightbox').on('shown.bs.modal', function () {
+
+        var screenImage = $("#lightbox img");
+        var theImage = new Image();
+        theImage.src = screenImage.attr("src");
+        ctrl.imageWidth = theImage.width;
+
+        $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
+      });
+    });
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .controller('imageGalleryController', imageGalleryController)
     .directive('imageGallery', imageGallery);
 
@@ -937,44 +975,6 @@ function loginCtrl($location, AuthentictionService){
     };
 
     ctrl.imageThumbs = FormatImageList($scope.content);
-  }
-
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
-
-  function imageLightbox(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html',
-      controller: imageLightboxController,
-      controllerAs: 'viewModel'
-    };
-  }
-
-  imageLightboxController.$inject = [];
-  function imageLightboxController(){
-    var ctrl = this;
-    ctrl.imageWidth = "";
-
-    $(document).ready(function(){
-
-      $('#lightbox').on('shown.bs.modal', function () {
-
-        var screenImage = $("#lightbox img");
-        var theImage = new Image();
-        theImage.src = screenImage.attr("src");
-        ctrl.imageWidth = theImage.width;
-
-        $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
-      });
-    });
   }
 
 })();
