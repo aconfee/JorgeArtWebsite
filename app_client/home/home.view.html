@@ -2,7 +2,7 @@
 
 <div class="home-page-container">
   <cover-image ng-show="viewModel.showCover" content="viewModel.coverImage"></cover-image>
-  <underline-page-break ng-show="viewModel.showVideo"></underline-page-break>
+  <underline-page-break ng-show="viewModel.showCover"></underline-page-break>
   <h1 ng-show="viewModel.projects === undefined">Sorry, no projects could be found here.</h1>
 
   <div class="flex-group-container" ng-repeat="row in viewModel.projects">

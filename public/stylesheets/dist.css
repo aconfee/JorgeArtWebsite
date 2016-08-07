@@ -7,8 +7,9 @@
 body {
   padding: 50px;
   font-size: 1.7em;
-  color: #232323;
-  background-color: white;
+  /*color:rgb(35, 35, 35);*/
+  color: white;
+  background-color: black;
   font-family: "openSansLight", "Oxygen", sans-serif; }
 
 a {
@@ -145,61 +146,6 @@ a {
   width: 100%;
   height: 100%; }
 
-.navbar-default .navbar-nav > .active {
-  color: black;
-  background: white;
-  font-weight: bold; }
-
-.navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:hover,
-.navbar-default .navbar-nav > .active > a:focus {
-  color: black;
-  background: white; }
-
-.navbar-default .navbar-nav > .active {
-  color: black;
-  background: white; }
-
-.navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:hover,
-.navbar-default .navbar-nav > .active > a:focus {
-  color: black;
-  background: white; }
-
-.navbar-default {
-  background-color: white;
-  opacity: 1;
-  letter-spacing: 0.11em;
-  text-align: center;
-  /* Uncomment shadow and make border color white to return to normal */
-  box-shadow: 0px 0px 10px #888888;
-  border-color: white; }
-
-.navbar .nav,
-.navbar .nav > li {
-  margin: 0 5px;
-  float: none;
-  display: inline-block;
-  *display: inline;
-  /* ie7 fix */
-  *zoom: 1;
-  /* hasLayout ie7 trigger */ }
-
-.navbar .nav > li > a {
-  opacity: 1;
-  padding-bottom: 8px; }
-
-.navbar .nav > li > a:hover {
-  color: black;
-  cursor: pointer; }
-
-.underline-page-break {
-  border-bottom: 2px solid silver;
-  margin-top: 20px;
-  margin-bottom: 30px;
-  margin-left: 10%;
-  margin-right: 10%; }
-
 .gallery-thumb-container {
   display: flex;
   width: 100%; }
@@ -249,6 +195,61 @@ a {
   -webkit-transform: translate3d(0, -300px, 0);
   transform: translate3d(0, -300px, 0);
   opacity: 1; }
+
+.navbar-default .navbar-nav > .active {
+  color: white;
+  background: black;
+  font-weight: bold; }
+
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+  color: white;
+  background: black; }
+
+.navbar-default .navbar-nav > .active {
+  color: white;
+  background: black; }
+
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+  color: white;
+  background: black; }
+
+.navbar-default {
+  background-color: black;
+  opacity: 1;
+  letter-spacing: 0.11em;
+  text-align: center;
+  /* Uncomment shadow and make border color white to return to normal */
+  /*box-shadow: 0px 0px 10px #888888;*/
+  border-color: black; }
+
+.navbar .nav,
+.navbar .nav > li {
+  margin: 0 5px;
+  float: none;
+  display: inline-block;
+  *display: inline;
+  /* ie7 fix */
+  *zoom: 1;
+  /* hasLayout ie7 trigger */ }
+
+.navbar .nav > li > a {
+  opacity: 1;
+  padding-bottom: 8px; }
+
+.navbar .nav > li > a:hover {
+  color: white;
+  cursor: pointer; }
+
+.underline-page-break {
+  border-bottom: 2px solid silver;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  margin-left: 10%;
+  margin-right: 10%; }
 
 .text-block {
   margin: 50px 5%; }

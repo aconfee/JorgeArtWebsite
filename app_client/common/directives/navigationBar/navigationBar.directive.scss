@@ -1,5 +1,5 @@
-$textColor: black;
-$backgroundColor: white;
+$textColor: white;
+$backgroundColor: black;
 
 .navbar-default .navbar-nav > .active{
    color: $textColor;
@@ -29,8 +29,8 @@ $backgroundColor: white;
 	text-align: center;
 
   /* Uncomment shadow and make border color white to return to normal */
-	box-shadow: 0px 0px 10px #888888;
-  border-color: white;
+	/*box-shadow: 0px 0px 10px #888888;*/
+  border-color: black;
 }
 
 .navbar .nav,
