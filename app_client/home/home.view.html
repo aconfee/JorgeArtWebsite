@@ -1,7 +1,7 @@
 <navigation-bar></navigation-bar>
 
 <div class="home-page-container">
-  <cover-image ng-show="viewModel.projects === undefined" content="viewModel.coverImage"></cover-image>
+  <cover-image ng-show="viewModel.showCover" content="viewModel.coverImage"></cover-image>
   <underline-page-break ng-show="viewModel.showVideo"></underline-page-break>
   <h1 ng-show="viewModel.projects === undefined">Sorry, no projects could be found here.</h1>
 

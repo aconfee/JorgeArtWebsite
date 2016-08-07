@@ -17,7 +17,7 @@
 
     viewModel.videoLink = $sce.trustAsResourceUrl("https://www.youtube.com/embed/CJ_GCPaKywg");
     viewModel.coverImage = "./images/cover.png";
-    viewModel.showVideo = categoryFilter === undefined; // Promo on 'all' page.
+    viewModel.showCover = categoryFilter === undefined; // Promo on 'all' page.
 
     ///
     /// Request the projects to disply on the home page.
