@@ -1,32 +1,32 @@
 .navbar-default .navbar-nav > .active {
-  color: white;
-  background: black;
+  color: black;
+  background: white;
   font-weight: bold; }
 
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: white;
-  background: black; }
+  color: black;
+  background: white; }
 
 .navbar-default .navbar-nav > .active {
-  color: white;
-  background: black; }
+  color: black;
+  background: white; }
 
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: white;
-  background: black; }
+  color: black;
+  background: white; }
 
 .navbar-default {
-  background-color: black;
+  background-color: white;
   opacity: 1;
   letter-spacing: 0.11em;
   text-align: center;
   /* Uncomment shadow and make border color white to return to normal */
-  /*box-shadow: 0px 0px 10px #888888;*/
-  border-color: black; }
+  box-shadow: 0px 0px 10px #888888;
+  border-color: white; }
 
 .navbar .nav,
 .navbar .nav > li {
@@ -43,5 +43,5 @@
   padding-bottom: 8px; }
 
 .navbar .nav > li > a:hover {
-  color: white;
+  color: black;
   cursor: pointer; }

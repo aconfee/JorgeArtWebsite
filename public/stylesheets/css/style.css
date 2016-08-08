@@ -7,9 +7,8 @@
 body {
   padding: 50px;
   font-size: 1.7em;
-  /*color:rgb(35, 35, 35);*/
-  color: white;
-  background-color: black;
+  color: #232323;
+  background-color: white;
   font-family: "openSansLight", "Oxygen", sans-serif; }
 
 a {
