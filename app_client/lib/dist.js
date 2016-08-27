@@ -232,6 +232,56 @@ function loginCtrl($location, AuthentictionService){
 }
 
 (function(){
+
+  angular
+    .module('PortfolioSPAModule')
+    .controller('dashboardController', dashboardController);
+
+  dashboardController.$inject = ['$scope', '$location', '$http', 'ProjectsService', 'AuthentictionService'];
+  function dashboardController($scope, $location, $http, ProjectsService, AuthentictionService){
+
+    var viewModel = this;
+    viewModel.projects = [];
+    viewModel.projectToDelete = {};
+
+    // Immediatelly check if a user is logged in, otherwise leave.
+    if(AuthentictionService.isLoggedIn() === false){
+      $location.path('/login');
+    }
+
+    ///
+    /// Request the projects to disply on the home page.
+    ///
+    ProjectsService.GetAllProjects(function(projects){
+      viewModel.projects = projects;
+    });
+
+    viewModel.markForDelete = function(index){
+      viewModel.projectToDelete = viewModel.projects[index];
+    };
+
+    viewModel.deleteProject = function(){
+      $http.delete('/api/projects/' + viewModel.projectToDelete._id, {
+        headers: {
+          Authorization: 'Bearer ' + AuthentictionService.getToken()
+        }
+      }).then(
+        function(response){
+
+          // Refresh projects list.
+          ProjectsService.GetAllProjects(function(projects){
+            viewModel.projects = projects;
+          });
+        },
+        function(response){
+          console.err("Something went wrong deleting a profile.");
+      });
+    };
+  }
+
+})();
+
+(function(){
   angular
     .module('PortfolioSPAModule')
     .service('AuthentictionService', AuthentictionService);
@@ -556,56 +606,6 @@ function loginCtrl($location, AuthentictionService){
 
   angular
     .module('PortfolioSPAModule')
-    .controller('dashboardController', dashboardController);
-
-  dashboardController.$inject = ['$scope', '$location', '$http', 'ProjectsService', 'AuthentictionService'];
-  function dashboardController($scope, $location, $http, ProjectsService, AuthentictionService){
-
-    var viewModel = this;
-    viewModel.projects = [];
-    viewModel.projectToDelete = {};
-
-    // Immediatelly check if a user is logged in, otherwise leave.
-    if(AuthentictionService.isLoggedIn() === false){
-      $location.path('/login');
-    }
-
-    ///
-    /// Request the projects to disply on the home page.
-    ///
-    ProjectsService.GetAllProjects(function(projects){
-      viewModel.projects = projects;
-    });
-
-    viewModel.markForDelete = function(index){
-      viewModel.projectToDelete = viewModel.projects[index];
-    };
-
-    viewModel.deleteProject = function(){
-      $http.delete('/api/projects/' + viewModel.projectToDelete._id, {
-        headers: {
-          Authorization: 'Bearer ' + AuthentictionService.getToken()
-        }
-      }).then(
-        function(response){
-
-          // Refresh projects list.
-          ProjectsService.GetAllProjects(function(projects){
-            viewModel.projects = projects;
-          });
-        },
-        function(response){
-          console.err("Something went wrong deleting a profile.");
-      });
-    };
-  }
-
-})();
-
-(function(){
-
-  angular
-    .module('PortfolioSPAModule')
     .controller('newProjectController', newProjectController);
 
   newProjectController.$inject = ['$scope', '$location', '$http', '$routeParams', 'AuthentictionService', 'UploadService' ,'ProjectsService'];
@@ -801,6 +801,52 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('embededVideo', embededVideo);
+
+  function embededVideo(){
+    return{
+      restrict:'EA',
+      scope:{
+        embededUrl: '=embededUrl'
+      },
+      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
+    .directive('navigationBar', navigationBar);
+
+  function navigationBar(){
+    return{
+      restrict:'EA',
+      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
+      controller: navigationBarController,
+      controllerAs: 'ctrl'
+    };
+  }
+
+  navigationBarController.$inject = ['$location'];
+  function navigationBarController($location){
+    var ctrl = this;
+
+    ctrl.isActive = function(path){
+      if(path.length === 1){
+        // If checking if we're on homepage...
+        return $location.path() === '/' && $location.search().category === undefined;
+      }
+
+      return $location.absUrl().indexOf(path) != -1;
+    };
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('fileModel', ['$parse', fileModel]);
 
   function fileModel($parse){
@@ -823,17 +869,39 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
-    .directive('embededVideo', embededVideo);
+    .directive('imageLightbox', imageLightbox);
 
-  function embededVideo(){
+  function imageLightbox(){
     return{
       restrict:'EA',
       scope:{
-        embededUrl: '=embededUrl'
+        content: '=content'
       },
-      templateUrl: '/common/directives/embededVideo/embededVideo.directive.html'
+      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html',
+      controller: imageLightboxController,
+      controllerAs: 'viewModel'
     };
   }
+
+  imageLightboxController.$inject = [];
+  function imageLightboxController(){
+    var ctrl = this;
+    ctrl.imageWidth = "";
+
+    $(document).ready(function(){
+
+      $('#lightbox').on('shown.bs.modal', function () {
+
+        var screenImage = $("#lightbox img");
+        var theImage = new Image();
+        theImage.src = screenImage.attr("src");
+        ctrl.imageWidth = theImage.width;
+
+        $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
+      });
+    });
+  }
+
 })();
 
 (function(){
@@ -937,74 +1005,6 @@ function loginCtrl($location, AuthentictionService){
     };
 
     ctrl.imageThumbs = FormatImageList($scope.content);
-  }
-
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('imageLightbox', imageLightbox);
-
-  function imageLightbox(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/imageLightbox/imageLightbox.directive.html',
-      controller: imageLightboxController,
-      controllerAs: 'viewModel'
-    };
-  }
-
-  imageLightboxController.$inject = [];
-  function imageLightboxController(){
-    var ctrl = this;
-    ctrl.imageWidth = "";
-
-    $(document).ready(function(){
-
-      $('#lightbox').on('shown.bs.modal', function () {
-
-        var screenImage = $("#lightbox img");
-        var theImage = new Image();
-        theImage.src = screenImage.attr("src");
-        ctrl.imageWidth = theImage.width;
-
-        $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
-      });
-    });
-  }
-
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('navigationBar', navigationBar);
-
-  function navigationBar(){
-    return{
-      restrict:'EA',
-      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
-      controller: navigationBarController,
-      controllerAs: 'ctrl'
-    };
-  }
-
-  navigationBarController.$inject = ['$location'];
-  function navigationBarController($location){
-    var ctrl = this;
-
-    ctrl.isActive = function(path){
-      if(path.length === 1){
-        // If checking if we're on homepage...
-        return $location.path() === '/' && $location.search().category === undefined;
-      }
-
-      return $location.absUrl().indexOf(path) != -1;
-    };
   }
 
 })();
