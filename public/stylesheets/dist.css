@@ -118,6 +118,17 @@ a {
   max-width: 200px;
   display: inline-block; }
 
+.cover-image-container {
+  display: flex;
+  width: 100%;
+  padding: 5px; }
+
+.cover-image {
+  flex: 1; }
+  .cover-image img {
+    width: 100%;
+    height: auto; }
+
 .video-container {
   position: relative;
   padding-bottom: 56.25%;
@@ -133,17 +144,6 @@ a {
   left: 0;
   width: 100%;
   height: 100%; }
-
-.cover-image-container {
-  display: flex;
-  width: 100%;
-  padding: 5px; }
-
-.cover-image {
-  flex: 1; }
-  .cover-image img {
-    width: 100%;
-    height: auto; }
 
 .navbar-default .navbar-nav > .active {
   color: black;

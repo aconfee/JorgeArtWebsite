@@ -20,6 +20,12 @@
 
     ProjectsService.GetProjectPage($routeParams.projectid, function(pageData){
       viewModel.blogItems = pageData;
+
+      console.log('proejct received');
+      setTimeout(function(){
+        console.log('parsing pins...');
+        $window.parsePins();
+      }, 500);
     });
 
     viewModel.nextProject = function(){
