@@ -24,12 +24,6 @@
     ///
     ProjectsService.GetProjectsHomePage(categoryFilter, function(projectsVm){
       viewModel.projects = projectsVm;
-
-      console.log('proejcts received');
-      setTimeout(function(){
-        console.log('parsing pins...');
-        $window.parsePins();
-      }, 500);
     });
 
     ///

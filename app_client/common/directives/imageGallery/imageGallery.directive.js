@@ -27,6 +27,8 @@
     var smallScreenMax = 650;
     var mediumScreenMax = 1000;
 
+    ctrl.hoveredThumbIndex = -1;
+
     var GetNumberOfColumns = function(){
       var numCols = 2;
 

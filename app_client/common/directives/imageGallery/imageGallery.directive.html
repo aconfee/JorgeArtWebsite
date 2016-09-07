@@ -3,8 +3,12 @@
 <div class="gallery-thumb-container">
   <div class="gallery-thumb-column" ng-repeat="thumbColumn in ctrl.imageThumbs">
     <div class="gallery-thumb-item" ng-repeat="image in thumbColumn" ng-click="ctrl.GalleryThumbClick(image);" data-toggle="modal" data-target="#lightbox">
-      <img src="{{image}}"/>
-      <div class="thumb-hover-screen"></div>
+      <img
+        src="{{image}}"
+        ng-mouseenter="ctrl.hoveredThumbIndex = $parent.$index + $index"
+        ng-mouseleave="ctrl.hoveredThumbIndex = -1"
+      />
+      <div class="thumb-hover-screen" ng-class="{ 'show': ctrl.hoveredThumbIndex === $parent.$index + $index }"></div>
     </div>
   </div>
 </div>
