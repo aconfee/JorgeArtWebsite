@@ -753,6 +753,22 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('coverImage', coverImage);
+
+  function coverImage(){
+    return{
+      restrict:'EA',
+      scope:{
+        content: '=content'
+      },
+      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
+    };
+  }
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('adminHeader', adminHeader);
 
   function adminHeader(){
@@ -780,22 +796,6 @@ function loginCtrl($location, AuthentictionService){
     };
   }
 
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('coverImage', coverImage);
-
-  function coverImage(){
-    return{
-      restrict:'EA',
-      scope:{
-        content: '=content'
-      },
-      templateUrl: '/common/directives/coverImage/coverImage.directive.html'
-    };
-  }
 })();
 
 (function(){
