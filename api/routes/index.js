@@ -20,7 +20,7 @@ router.get('/projects/:projectsid', ctrlProjects.getProject); // done
 router.put('/projects/:projectsid', auth, ctrlProjects.editProject);
 router.delete('/projects/:projectsid', auth, ctrlProjects.deleteProject);
 
-//router.post('/register', ctrlAuth.register); // Use in postman to add a user if need ever be.
+router.post('/register', ctrlAuth.register); // Use in postman to add a user if need ever be.
 router.post('/login', ctrlAuth.login);
 
 router.post('/upload', auth, ctrlUpload.upload.any(), ctrlUpload.uploadImage);
