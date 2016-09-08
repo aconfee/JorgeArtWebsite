@@ -69,6 +69,49 @@ function aboutController($scope){
   viewModel.myVariable = "I'm pretty cool, I guess.";
 }
 
+angular
+  .module('PortfolioSPAModule')
+  .controller('loginCtrl', loginCtrl);
+
+loginCtrl.$inject = ['$location', 'AuthentictionService'];
+function loginCtrl($location, AuthentictionService){
+  var viewModel = this;
+
+  viewModel.pageHeader = {
+    title: 'Admin Sign In'
+  };
+
+  viewModel.credentials = {
+    username: "",
+    password: ""
+  };
+
+  viewModel.returnPage = '/admin'; // Go to admin page once logged in.
+  viewModel.onSubmit = function(){
+    viewModel.formError = "";
+    if(!viewModel.credentials.username || !viewModel.credentials.password){
+      viewModel.formError = "All fields required.";
+      return false;
+    }
+    else{
+      viewModel.doLogin();
+    }
+  };
+
+  viewModel.doLogin = function(){
+    viewModel.formError = "";
+    AuthentictionService
+      .login(viewModel.credentials)
+      .error(function(err){
+        viewModel.formError = err.message;
+      })
+      .then(function(){
+        //$location.search('page', null); no need to get query param for return page.
+        $location.path(viewModel.returnPage);
+      });
+  };
+}
+
 // Using function scopes to prevent global scope variables.
 // God, I can't wait to use typescript.
 (function(){
@@ -126,49 +169,6 @@ function aboutController($scope){
   }
 
 })();
-
-angular
-  .module('PortfolioSPAModule')
-  .controller('loginCtrl', loginCtrl);
-
-loginCtrl.$inject = ['$location', 'AuthentictionService'];
-function loginCtrl($location, AuthentictionService){
-  var viewModel = this;
-
-  viewModel.pageHeader = {
-    title: 'Admin Sign In'
-  };
-
-  viewModel.credentials = {
-    username: "",
-    password: ""
-  };
-
-  viewModel.returnPage = '/admin'; // Go to admin page once logged in.
-  viewModel.onSubmit = function(){
-    viewModel.formError = "";
-    if(!viewModel.credentials.username || !viewModel.credentials.password){
-      viewModel.formError = "All fields required.";
-      return false;
-    }
-    else{
-      viewModel.doLogin();
-    }
-  };
-
-  viewModel.doLogin = function(){
-    viewModel.formError = "";
-    AuthentictionService
-      .login(viewModel.credentials)
-      .error(function(err){
-        viewModel.formError = err.message;
-      })
-      .then(function(){
-        //$location.search('page', null); no need to get query param for return page.
-        $location.path(viewModel.returnPage);
-      });
-  };
-}
 
 (function(){
 
@@ -817,6 +817,36 @@ function loginCtrl($location, AuthentictionService){
 (function(){
   angular
     .module('PortfolioSPAModule')
+    .directive('navigationBar', navigationBar);
+
+  function navigationBar(){
+    return{
+      restrict:'EA',
+      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
+      controller: navigationBarController,
+      controllerAs: 'ctrl'
+    };
+  }
+
+  navigationBarController.$inject = ['$location'];
+  function navigationBarController($location){
+    var ctrl = this;
+
+    ctrl.isActive = function(path){
+      if(path.length === 1){
+        // If checking if we're on homepage...
+        return $location.path() === '/' && $location.search().category === undefined;
+      }
+
+      return $location.absUrl().indexOf(path) != -1;
+    };
+  }
+
+})();
+
+(function(){
+  angular
+    .module('PortfolioSPAModule')
     .directive('fileModel', ['$parse', fileModel]);
 
   function fileModel($parse){
@@ -977,36 +1007,6 @@ function loginCtrl($location, AuthentictionService){
         $(this).find(".modal-dialog").css("width", ctrl.imageWidth);
       });
     });
-  }
-
-})();
-
-(function(){
-  angular
-    .module('PortfolioSPAModule')
-    .directive('navigationBar', navigationBar);
-
-  function navigationBar(){
-    return{
-      restrict:'EA',
-      templateUrl: '/common/directives/navigationBar/navigationBar.directive.html',
-      controller: navigationBarController,
-      controllerAs: 'ctrl'
-    };
-  }
-
-  navigationBarController.$inject = ['$location'];
-  function navigationBarController($location){
-    var ctrl = this;
-
-    ctrl.isActive = function(path){
-      if(path.length === 1){
-        // If checking if we're on homepage...
-        return $location.path() === '/' && $location.search().category === undefined;
-      }
-
-      return $location.absUrl().indexOf(path) != -1;
-    };
   }
 
 })();
