@@ -113,6 +113,67 @@
       });
     };
 
+    ///
+    /// Remove an item from the gallery content array.
+    ///
+    viewModel.deleteFromContentArray = function(pageItemIndex, itemIndex){
+
+      var validIndices = viewModel.contentArrayAccessCheck(pageItemIndex, itemIndex);
+      if(validIndices === false) return;
+
+      viewModel.newProject.pageItems[pageItemIndex].contentArray.splice(itemIndex, 1);
+    };
+
+    ///
+    /// Reorder an item in the content array by shifting it up or down (left or right). 
+    ///
+    viewModel.moveContentArrayItem = function(pageItemIndex, itemIndex, moveUp /* bool */){
+      var validIndices = viewModel.contentArrayAccessCheck(pageItemIndex, itemIndex);
+      if(validIndices === false) return;
+
+      var temp = viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex];
+
+      if(moveUp){
+        if(viewModel.contentArrayAccessCheck(pageItemIndex, itemIndex - 1) === false){
+          return;
+        }
+
+        viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex] = viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex - 1];
+        viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex - 1] = temp;
+      }
+      else{
+        if(viewModel.contentArrayAccessCheck(pageItemIndex, itemIndex + 1) === false){
+          return;
+        }
+
+        viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex] = viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex + 1];
+        viewModel.newProject.pageItems[pageItemIndex].contentArray[itemIndex + 1] = temp;
+      }
+    };
+
+    viewModel.contentArrayAccessCheck = function(pageItemIndex, itemIndex){
+      // If page item list is not valid or page item index is invalid, leave.
+      if(viewModel.newProject.pageItems === undefined ||
+        pageItemIndex >= viewModel.newProject.pageItems.length ||
+        pageItemIndex < 0){
+          return false;
+      }
+
+      // If content array on this page item isn't valid, leave.
+      if(viewModel.newProject.pageItems[pageItemIndex].contentArray === undefined ||
+        viewModel.newProject.pageItems[pageItemIndex].contentArray.length === 0){
+          return false;
+      }
+
+      // If content item index is invalid, leave.
+      if(itemIndex >= viewModel.newProject.pageItems[pageItemIndex].contentArray.length ||
+        itemIndex < 0){
+          return false;
+      }
+
+      return true;
+    };
+
     viewModel.addNewPageItem = function(){
       if(viewModel.newProject.pageItems === undefined){
         viewModel.newProject.pageItems = [];

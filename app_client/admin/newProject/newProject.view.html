@@ -85,7 +85,12 @@
         <div ng-if="pageItem.type == 'gallery'" style="margin: 5px 10px;">
           <div class="image-upload-box" style="overflow-x:scroll;">
             <div style="min-width:5000px; min-height: 200px; max-height: 200px; overflow: none;">
-              <img ng-repeat="image in pageItem.contentArray" src="{{ image }}" class="upload-preview-image-multi"/>
+              <div class='gallery-image-container' ng-repeat="image in pageItem.contentArray">
+                <img src="{{ image }}" class="upload-preview-image-multi"/>
+                <button class="btn btn-danger" ng-click="viewModel.deleteFromContentArray($parent.$index, $index)">DELETE</button>
+                <button class="btn btn-primary" ng-click="viewModel.moveContentArrayItem($parent.$index, $index, true)">^</button>
+                <button class="btn btn-primary" ng-click="viewModel.moveContentArrayItem($parent.$index, $index, false)">v</button>
+              </div>
             </div>
           </div>
           <form  enctype="multipart/form-data" style="display: inline-block;">
